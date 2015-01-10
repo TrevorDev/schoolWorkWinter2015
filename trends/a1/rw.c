@@ -63,12 +63,28 @@ void* writer(void *arg)
     return NULL;
 }
 
+void* reader(void *arg)
+{
+    int rID = (int)*((int*)arg);
+    //pthread_t id = pthread_self();
+    sleep(1);
+    pthread_mutex_lock(&wLock);{
+        char * str = fileToString(fileName);
+        print("%s", str);
+        free(str);    
+    }pthread_mutex_unlock(&wLock);
+       
+    
+    return NULL;
+}
+
 
 int main()
 {
-    //int readers = 5;
+    int readers = 5;
     int writers = 5;
     int wIDs[writers];
+    int rIDs[readers];
     FILE *fptr = getFile("w+");
     if(fptr == NULL)
     {
@@ -83,9 +99,7 @@ int main()
         }
     }
     fclose(fptr);
-    // char * str = fileToString(fileName);
-    // print("%s", str);
-    // free(str);
+    
     int threadCount = 0;
     for(int i = 0;i<writers;i++)
     {
@@ -97,11 +111,25 @@ int main()
             printf("\n Thread created successfully\n");
     }
 
+    for(int i = 0;i<readers;i++)
+    {
+        rIDs[i] = i;
+        int err = pthread_create(&(tid[threadCount++]), NULL, &reader, &rIDs[i]);
+        if (err != 0)
+            printf("\ncan't create thread :[%s]", strerror(err));
+        else
+            printf("\n Thread created successfully\n");
+    }
+
     for(int i = 0;i<threadCount;i++)
     {
         pthread_join(tid[i], NULL);
     }
 
-    sleep(3);
+    //sleep(3);
+
+    char * str = fileToString(fileName);
+    print("%s", str);
+    free(str);
     return 0;
 }
