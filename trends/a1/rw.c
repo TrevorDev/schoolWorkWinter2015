@@ -1,13 +1,20 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
+#include <semaphore.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 #include "dlxlib.h"
 
 pthread_t tid[1000];
-pthread_mutex_t rLock;
+int readers;
+int rIt = 5;
+int wIt = 5;
+sem_t readerSem;
 pthread_mutex_t wLock;
+pthread_mutex_t printLock;
+
 char * fileName = "file.txt";
 
 FILE* getFile(char*str){
@@ -21,43 +28,67 @@ vector * readFileToVector(){
     return v;
 }
 
+void randSleep(){
+    //usleep((rand() % 1000)+1);
+}
+
+void writerWait(){
+    pthread_mutex_lock(&wLock);
+    for(int i = 0;i<readers;i++){
+        sem_wait(&readerSem);
+    }
+}
+
+void writerPost(){
+    for(int i = 0;i<readers;i++){
+        sem_post(&readerSem);
+    }
+    pthread_mutex_unlock(&wLock);
+}
+
 void* writer(void *arg)
 {
-    int wID = (int)*((int*)arg);
-    //pthread_t id = pthread_self();
-    pthread_mutex_lock(&wLock);{
-            vector * v = readFileToVector();
-            char**ar = (char**)v->ar;
-            
-            int myCount = atoi(ar[wID]);
-            myCount++;
-            
-            char myCStr[15];
-            sprintf(myCStr, "%d", myCount);
-
-            //write increased count
-            FILE *fptr = getFile("w+");{
-                for(int i = 0;i<v->size;i++){
-                    char*token = ar[i];
-                    if(i==wID){
-                        token=myCStr;
-                    }
-                    if(i == v->size-1){
-                        fprintf(fptr, "%s", token);
-                    }else{
-                        fprintf(fptr, "%s ", token);
-                    }
-                }
-            }fclose(fptr);
-            
-            //free vector
-            for(int i = 0;i < v->size;i++){
-                free(ar[i]);
-            }
-            free(v->ar);
-            free(v);
+    for(int i = 0;i<wIt;i++){
+        randSleep();
+        int wID = (int)*((int*)arg);
+        //pthread_t id = pthread_self();
+        writerWait();{
+                vector * v = readFileToVector();
+                char**ar = (char**)v->ar;
                 
-    }pthread_mutex_unlock(&wLock);
+                int myCount = atoi(ar[wID]);
+                myCount++;
+                
+                char myCStr[15];
+                sprintf(myCStr, "%d", myCount);
+
+                //write increased count
+                FILE *fptr = getFile("w+");{
+                    for(int i = 0;i<v->size;i++){
+                        char*token = ar[i];
+                        if(i==wID){
+                            token=myCStr;
+                        }
+                        if(i == v->size-1){
+                            fprintf(fptr, "%s", token);
+                        }else{
+                            fprintf(fptr, "%s ", token);
+                        }
+                    }
+                }fclose(fptr);
+                pthread_mutex_lock(&printLock);
+                print("Writer: %d has written", wID);
+                pthread_mutex_unlock(&printLock);
+
+                //free vector
+                for(int i = 0;i < v->size;i++){
+                    free(ar[i]);
+                }
+                free(v->ar);
+                free(v);        
+        }writerPost();
+    }
+    
        
     
     return NULL;
@@ -65,14 +96,17 @@ void* writer(void *arg)
 
 void* reader(void *arg)
 {
+    randSleep();
     int rID = (int)*((int*)arg);
     //pthread_t id = pthread_self();
-    sleep(1);
-    pthread_mutex_lock(&wLock);{
+    //sleep(1);
+    sem_wait(&readerSem);{
         char * str = fileToString(fileName);
-        print("%s", str);
+        pthread_mutex_lock(&printLock);
+        print("Reader: %d read: %s", rID, str);
+        pthread_mutex_unlock(&printLock);
         free(str);    
-    }pthread_mutex_unlock(&wLock);
+    }sem_post(&readerSem);
        
     
     return NULL;
@@ -81,8 +115,9 @@ void* reader(void *arg)
 
 int main()
 {
-    int readers = 5;
+    readers = 5;
     int writers = 5;
+    sem_init(&readerSem, 0, readers);
     int wIDs[writers];
     int rIDs[readers];
     FILE *fptr = getFile("w+");
@@ -107,8 +142,8 @@ int main()
         int err = pthread_create(&(tid[threadCount++]), NULL, &writer, &wIDs[i]);
         if (err != 0)
             printf("\ncan't create thread :[%s]", strerror(err));
-        else
-            printf("\n Thread created successfully\n");
+        //else
+            //printf("\n Thread created successfully\n");
     }
 
     for(int i = 0;i<readers;i++)
@@ -117,8 +152,8 @@ int main()
         int err = pthread_create(&(tid[threadCount++]), NULL, &reader, &rIDs[i]);
         if (err != 0)
             printf("\ncan't create thread :[%s]", strerror(err));
-        else
-            printf("\n Thread created successfully\n");
+        //else
+            //printf("\n Thread created successfully\n");
     }
 
     for(int i = 0;i<threadCount;i++)
