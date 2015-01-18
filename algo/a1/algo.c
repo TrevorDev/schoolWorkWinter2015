@@ -10,16 +10,16 @@ long long fact(long long x){
     }
 }
 
-float logt(float f){
-    return (logf(f)/logf(2));
+double logt(double f){
+    return (log2(f));
 }
 
-float nlogRes(long long c, long long mid){
+double nlogRes(long long c, long long mid){
     return -(mid*logt(mid)-c);
 }
 
-float factRes(long long c, long long mid){
-    return ((float)c/(float)fact(mid))-1;
+double factRes(long long c, long long mid){
+    return ((double)c/(double)fact(mid))-1;
 }
 
 int main(int argc, char **argv)
@@ -28,13 +28,15 @@ int main(int argc, char **argv)
         printf("ALGO\nTo run this program use ALGO X\neg. ./ALGO 24\n");
         return 0;
     }
-    //float c = strtof(argv[1], NULL);
+    //double c = strtof(argv[1], NULL);
     //long long c = 24;
-    long long c = atoi(argv[1]);
-    // float low = 0;
-    // float high = 32000;
-    // float mid = 0;
-    // float res = 0;
+    char * e;
+    long long c = strtoll(argv[1], &e, 0);
+    //printf("%lld\n", c);
+    // double low = 0;
+    // double high = 32000;
+    // double mid = 0;
+    // double res = 0;
     
     // while(high - low > 0.0001){
     //     mid = (low+high)/2;
@@ -47,11 +49,11 @@ int main(int argc, char **argv)
     // }
     // printf("%f\n%f\n%f\n", mid, mid*logt(mid), c);
 
-    long long high =  2147483647;
+    long long high =  9223372036854775807;
     long long low = 0;
     long long mid = 0;
     long long ans = 0;
-    float res = 0;
+    double res = 0;
     while((high - low) > 1){
         mid = (high+low)/2;
         res = nlogRes(c, mid);
@@ -67,9 +69,10 @@ int main(int argc, char **argv)
     }else{
         ans = low;
     }
-    printf("n1 = %lld %lld %lld %f\n", ans, high, low, ans*logt(ans)-c);
+    //printf("n1 = %lld %lld %lld %f\n", ans, high, low, ans*logt(ans)-c);
+    printf("n1 = %lld\n", ans);
 
-    high =  10;
+    high =  20;
     low = 0;
     mid = 0;
     ans = 0;
@@ -90,7 +93,8 @@ int main(int argc, char **argv)
         ans = low;
     }
 
-    printf("n2 = %lld %lld %lld %f\n", ans, high, low, ((float)c/(float)fact(ans))-1);
+    //printf("n2 = %lld %lld %lld %f\n", ans, high, low, ((double)c/(double)fact(ans))-1);
+    printf("n2 = %lld\n", ans);
     //printf("%d\n", mid);
 
 
