@@ -1,0 +1,25 @@
+%{
+         int num_lines = 0, num_chars = 0;
+%}
+DIGIT    [0-9]
+HEX      [0-9a-fA-F]
+OCT      [0-7]
+CHAR     [a-zA-z0-9]
+%%
+car                                                  printf("car\n");
+cdr                                                  printf("cdr\n");
+0|([-+]?[1-9]{DIGIT}*)                               printf("digit %s\n", yytext);
+([-+]?0x{HEX}+)                                      printf("hex %s\n", yytext);
+([-+]?0{OCT}+)                                       printf("oct %s\n", yytext);
+{DIGIT}+\.{DIGIT}+[eE](0|([-+]?[1-9]{DIGIT}*))?      printf("real %s\n", yytext);
+{CHAR}{CHAR}+                                        printf("str %s\n", yytext);
+CHAR                                                 printf("char %s\n", yytext);
+\(                                                   printf("left p\n");
+\)                                                   printf("right p\n");
+\n                                                   ++num_lines; ++num_chars;
+.                                                    ++num_chars;
+%%
+int main(){
+        yylex();
+        printf( "# of lines = %d, # of chars = %d\n",num_lines, num_chars );
+}
