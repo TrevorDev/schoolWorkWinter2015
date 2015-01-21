@@ -9,8 +9,9 @@
 
 pthread_t tid[1000];
 int readers;
-int rIt = 5;
-int wIt = 5;
+int writers;
+int rIt;
+int wIt;
 sem_t readerSem;
 pthread_mutex_t wLock;
 pthread_mutex_t printLock;
@@ -29,7 +30,7 @@ vector * readFileToVector(){
 }
 
 void randSleep(){
-    //usleep((rand() % 1000)+1);
+    nanosleep((struct timespec[]){{0, rand()%900000000}}, NULL);
 }
 
 void writerWait(){
@@ -76,9 +77,9 @@ void* writer(void *arg)
                         }
                     }
                 }fclose(fptr);
-                pthread_mutex_lock(&printLock);
-                print("Writer: %d has written", wID);
-                pthread_mutex_unlock(&printLock);
+                // pthread_mutex_lock(&printLock);
+                // print("Writer: %d has written", wID+1);
+                // pthread_mutex_unlock(&printLock);
 
                 //free vector
                 for(int i = 0;i < v->size;i++){
@@ -96,27 +97,38 @@ void* writer(void *arg)
 
 void* reader(void *arg)
 {
-    randSleep();
-    int rID = (int)*((int*)arg);
-    //pthread_t id = pthread_self();
-    //sleep(1);
-    sem_wait(&readerSem);{
-        char * str = fileToString(fileName);
-        pthread_mutex_lock(&printLock);
-        print("Reader: %d read: %s", rID, str);
-        pthread_mutex_unlock(&printLock);
-        free(str);    
-    }sem_post(&readerSem);
-       
+    for(int i = 0;i<rIt;i++){
+        randSleep();
+        int rID = (int)*((int*)arg);
+        //pthread_t id = pthread_self();
+        //sleep(1);
+        sem_wait(&readerSem);{
+            char * str = fileToString(fileName);
+            pthread_mutex_lock(&printLock);
+            print("Reader: %d read: %s", rID+1, str);
+            pthread_mutex_unlock(&printLock);
+            free(str);    
+        }sem_post(&readerSem);
+    }
     
     return NULL;
 }
 
 
-int main()
+int main(int argc, char **argv)
 {
-    readers = 5;
-    int writers = 5;
+    if(argc <= 1){
+        printf("ALGO\nTo run this program use ALGO X\neg. ./ALGO 24\n");
+        return 0;
+    }
+    rIt = (int)atof(argv[1]);
+    // rIt = 5;
+    // wIt = 20;
+    //rIt = 20;
+    wIt = rIt;
+    readers = (int)atof(argv[2]);
+    writers = (int)atof(argv[3]);
+
     sem_init(&readerSem, 0, readers);
     int wIDs[writers];
     int rIDs[readers];
@@ -164,7 +176,7 @@ int main()
     //sleep(3);
 
     char * str = fileToString(fileName);
-    print("%s", str);
+    print("All have finished resulting file:\n%s\n", str);
     free(str);
     return 0;
 }
