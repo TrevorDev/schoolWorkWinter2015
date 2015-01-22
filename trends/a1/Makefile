@@ -1,7 +1,7 @@
 CC          =	gcc
 # Flags that are sent to the compiler
 # Do not change these
-CFLAGS      = -g -pedantic -Wall -std=c99
+CFLAGS      = -g -pedantic -Wall -std=c99 -D_POSIX_C_SOURCE=199309L
 LDFLAGS     =
 
 #Directories where the compiler can find things

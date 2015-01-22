@@ -106,6 +106,7 @@ void* reader(void *arg)
             char * str = fileToString(fileName);
             pthread_mutex_lock(&printLock);
             print("Reader: %d read: %s", rID+1, str);
+            fflush(stdout);
             pthread_mutex_unlock(&printLock);
             free(str);    
         }sem_post(&readerSem);
@@ -114,13 +115,14 @@ void* reader(void *arg)
     return NULL;
 }
 
-
+//./rw 20 5 3 >> out 2>&1;./rw 20 10 5 >> out 2>&1;./rw 20 4 7 >> out 2>&1
 int main(int argc, char **argv)
 {
     if(argc <= 1){
-        printf("ALGO\nTo run this program use ALGO X\neg. ./ALGO 24\n");
+        printf("To run this program use arguments eg. ./rw numIter numReaders numWriters\n");
         return 0;
     }
+
     rIt = (int)atof(argv[1]);
     // rIt = 5;
     // wIt = 20;
@@ -128,6 +130,8 @@ int main(int argc, char **argv)
     wIt = rIt;
     readers = (int)atof(argv[2]);
     writers = (int)atof(argv[3]);
+
+    printf("Starting %d iterations with %d readers and %d writers\n", rIt, readers, writers);
 
     sem_init(&readerSem, 0, readers);
     int wIDs[writers];
