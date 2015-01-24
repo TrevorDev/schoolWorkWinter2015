@@ -88,6 +88,7 @@ int main(int argc, char **argv)
 		        setNode(&nodes[i], INT, 10);
 						addMatcherToNode(&nodes[i], INTDIG, 4);
 						addMatcherToNode(&nodes[i], ".", 9);
+						addMatcherToNode(&nodes[i], "eE", 17);
 		        break;
 		      case 5:
 		        setNode(&nodes[i], LEFT_PAREN, 10);
@@ -156,11 +157,14 @@ int main(int argc, char **argv)
 	}
 
 	int curNode = 0;
-	for(int c = getchar();c!=EOF;c = getchar()){
+	for(int c = getchar();;c = getchar()){
       //print("%c", c);
-      if(c == ' ' || c == '\n'){
+      if(c == ' ' || c == '\n' || c==EOF){
       	printf("%s ", nodes[curNode].token);
       	curNode = 0;
+      	if(c==EOF){
+      		break;
+      	}
       	continue;
       }
       int found = 0;
@@ -177,7 +181,7 @@ int main(int argc, char **argv)
       }
       
   }
-  print("");
+  printf("\n");
 
 	//print("%s", nodes[0].token);
 
