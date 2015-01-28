@@ -40,16 +40,32 @@ long long unsigned fib2(unsigned n) {
 
 int main()   {
     clock_t start, finish;
-     start = clock();
+    int reps = 1000000;
+    int n = 20;
+    int i;
 
-    int sum = 0,i;
-    for (i = 0; i < 100000; i++) {
-        sum+=i;
+    start = clock();
+    for (i = 0; i < reps; i++) {
+        fib(n);
     }
-    printf("sum = %d \n\n", sum);
+    finish = clock();
+    elapsed = (double)(finish - start) / CLOCKS_PER_SEC;
+    printf("rec time = %f \n\n", elapsed);
 
-     finish = clock();
-     elapsed = (double)(finish - start) / CLOCKS_PER_SEC;
-    printf("time = %f8.5 \n\n", elapsed);
+    start = clock();
+    for (i = 0; i < reps; i++) {
+        fib1(n);
+    }
+    finish = clock();
+    elapsed = (double)(finish - start) / CLOCKS_PER_SEC;
+    printf("it time = %f \n\n", elapsed);
+
+    start = clock();
+    for (i = 0; i < reps; i++) {
+        fib2(n);
+    }
+    finish = clock();
+    elapsed = (double)(finish - start) / CLOCKS_PER_SEC;
+    printf("const time = %f \n\n", elapsed);
 
 }
