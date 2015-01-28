@@ -1,0 +1,3 @@
+To run cd to this folder
+run make
+run ./scanner < test.txt

@@ -32,7 +32,6 @@ default : all
 
 all : prog
 
-
 prog : build
 	$(CC) $(LIBDIRS) $(LDFLAGS) -o $(PROGNAME)  $(OBJS) $(LIBS)
 build: $(SOURCE)
@@ -40,6 +39,8 @@ build: $(SOURCE)
 
 clean:
 	@ rm *.o
+
+scanner: prog 
 
 run: prog 
 	$(PROGNAME)
