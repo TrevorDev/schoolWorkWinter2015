@@ -1,4 +1,6 @@
 #include "dlxlib.h"
+#define MAX_CONN 1000
+#include <fcntl.h>
 
 void error(const char *msg)
 {
@@ -43,13 +45,13 @@ void* connectionHandler(void *arg)
     }
 
     close(newsockfd);
-    
+    pthread_exit(0);
     return NULL;
 }
-#define MAX_CONN 1000
-int main(int argc, char **argv)
-{    
-    
+
+void* runServer(void *arg)
+{
+    int stopfd = *((int*)arg);
     pthread_t tid[MAX_CONN];
     int connSocket[MAX_CONN];
 
@@ -57,7 +59,25 @@ int main(int argc, char **argv)
     int sockfd = createTcpServerSocket(3000);
     struct sockaddr_in cli_addr;
     socklen_t clilen = sizeof(cli_addr);
-    while(1){
+    //while(1){
+        fd_set read_fd_set;
+        FD_ZERO (&read_fd_set);
+        FD_SET (sockfd, &read_fd_set);
+        FD_SET (stopfd, &read_fd_set);
+        int maxfd = stopfd > sockfd ? stopfd : sockfd;
+        {
+            int i = select(maxfd+1, &read_fd_set, NULL, NULL, NULL);
+            if(i == -1){
+                error("bad select");
+            }
+            print("%d", i);
+            char buf[10];
+            read(stopfd, buf, 10);
+            print("%s", buf);
+            error("done");
+        }
+        
+        
         int newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
         if (newsockfd < 0){
             error("ERROR on accept");
@@ -68,11 +88,35 @@ int main(int argc, char **argv)
         int err = pthread_create(&(tid[threadCount]), NULL, &connectionHandler, &connSocket[threadCount]);
         threadCount++;
         if (err != 0){
-             printf("\ncan't create thread :[%s]", strerror(err));
+             error("can't create thread");
         }
         //NEED TO JOIN
-        //pthread_join(tid[threadCount-1], NULL);
-    }
+        pthread_join(tid[threadCount-1], NULL);
+    //}
     close(sockfd);
+    pthread_exit(0);
+    return NULL;
+}
+
+int main(int argc, char **argv)
+{
+    pthread_t serverThread;
+    int signalfd = open("testfile.txt", O_RDWR | O_CREAT);
+    if (signalfd < 0) {
+        error("unable to open signalfd");
+    }
+    int err = pthread_create(&serverThread, NULL, &runServer, &signalfd);
+    if (err != 0){
+         printf("\ncan't create thread :[%s]", strerror(err));
+    }
+    print("server started");
+    int c = 0;
+    while(c!='q'){
+        c=getchar();
+    }
+    // if (write(signalfd, "stop\n", 5) != 5) {
+    //     error("unable to write");
+    // }
+    pthread_join(serverThread, NULL);
     return 0; 
 }
