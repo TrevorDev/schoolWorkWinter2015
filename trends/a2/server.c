@@ -1,31 +1,11 @@
 #include "dlxlib.h"
 #define MAX_CONN 1000
-#include <fcntl.h>
+
 
 void error(const char *msg)
 {
     print("%s", msg);
     exit(1);
-}
-
-int createTcpServerSocket(int port){
-    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0){
-        error("ERROR opening socket");
-    }
-        
-    struct sockaddr_in serv_addr;
-    bzero((char *) &serv_addr, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = INADDR_ANY;
-    serv_addr.sin_port = htons(port);
-
-    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0){
-        error("ERROR on binding");
-    }
-
-    listen(sockfd,5);
-    return sockfd;
 }
 
 void* connectionHandler(void *arg)
@@ -59,25 +39,28 @@ void* runServer(void *arg)
     int sockfd = createTcpServerSocket(3000);
     struct sockaddr_in cli_addr;
     socklen_t clilen = sizeof(cli_addr);
-    //while(1){
-        fd_set read_fd_set;
-        FD_ZERO (&read_fd_set);
-        FD_SET (sockfd, &read_fd_set);
-        FD_SET (stopfd, &read_fd_set);
-        int maxfd = stopfd > sockfd ? stopfd : sockfd;
-        {
-            int i = select(maxfd+1, &read_fd_set, NULL, NULL, NULL);
-            if(i == -1){
-                error("bad select");
-            }
-            print("%d", i);
-            char buf[10];
-            read(stopfd, buf, 10);
-            print("%s", buf);
-            error("done");
+
+    fd_set read_fd_set;
+    FD_ZERO (&read_fd_set);
+    FD_SET (sockfd, &read_fd_set);
+    FD_SET (stopfd, &read_fd_set);
+    int maxfd = stopfd > sockfd ? stopfd : sockfd;
+    while(1){
+        if(select(maxfd+1, &read_fd_set, NULL, NULL, NULL) == -1){
+            error("bad select");
         }
-        
-        
+        if(dataAvailible(stopfd)){
+            error("how");
+            char buf[5];
+            read(stopfd, buf, 5);
+            print("%s", buf);
+            //error("done");
+            //exit
+            close(sockfd);
+            pthread_exit(0);
+            return NULL;
+        }        
+        print("hit");
         int newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
         if (newsockfd < 0){
             error("ERROR on accept");
@@ -92,20 +75,17 @@ void* runServer(void *arg)
         }
         //NEED TO JOIN
         pthread_join(tid[threadCount-1], NULL);
-    //}
-    close(sockfd);
-    pthread_exit(0);
+    }
+    
     return NULL;
 }
 
 int main(int argc, char **argv)
 {
     pthread_t serverThread;
-    int signalfd = open("testfile.txt", O_RDWR | O_CREAT);
-    if (signalfd < 0) {
-        error("unable to open signalfd");
-    }
-    int err = pthread_create(&serverThread, NULL, &runServer, &signalfd);
+    int fd[2];
+    pipe(fd);
+    int err = pthread_create(&serverThread, NULL, &runServer, &fd[0]);
     if (err != 0){
          printf("\ncan't create thread :[%s]", strerror(err));
     }
@@ -114,9 +94,9 @@ int main(int argc, char **argv)
     while(c!='q'){
         c=getchar();
     }
-    // if (write(signalfd, "stop\n", 5) != 5) {
-    //     error("unable to write");
-    // }
+    if (write(fd[1], "stop\n", 5) != 5) {
+        error("unable to write");
+    }
     pthread_join(serverThread, NULL);
     return 0; 
 }

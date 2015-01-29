@@ -166,3 +166,68 @@ int print(const char * format, ...) {
 	printf("\n");
 	return done;
 }
+
+//SOCKETS/NETWORKING
+
+int dataAvailible(int fd){
+    fd_set read_fd_set;
+    FD_ZERO (&read_fd_set);
+    FD_SET (fd, &read_fd_set);
+    struct timeval timeout;
+    timeout.tv_sec = 20;
+    timeout.tv_usec = 0;
+    if(select(fd+1, &read_fd_set, NULL, NULL, &timeout) == 0){
+        return 0;
+    }else{
+        return 1;
+    }
+}
+
+int createTcpServerSocket(int port){
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0){
+        //error("ERROR opening socket");
+        return -1;
+    }
+        
+    struct sockaddr_in serv_addr;
+    bzero((char *) &serv_addr, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = INADDR_ANY;
+    serv_addr.sin_port = htons(port);
+
+    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0){
+        //error("ERROR on binding");
+        return -1;
+    }
+
+    listen(sockfd,5);
+    return sockfd;
+}
+
+int createTcpClientSocket(int port, char*hostname){
+    struct sockaddr_in serv_addr;
+    struct hostent *server;
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0){
+        //error("ERROR opening socket");
+        return -1;
+    }
+    server = gethostbyname(hostname);
+    if (server == NULL) {
+        // fprintf(stderr,"ERROR, no such host\n");
+        // exit(0);
+        return -1;
+    }
+    bzero((char *) &serv_addr, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
+    serv_addr.sin_port = htons(port);
+
+
+    if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0){
+        //error("ERROR connecting");
+        return -1;
+    }
+    return sockfd;
+}

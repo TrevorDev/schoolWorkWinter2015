@@ -15,6 +15,7 @@ date: Nov 11 2013
 #include <stdarg.h>
 #include <errno.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 //time
 #include <sys/time.h>
@@ -30,6 +31,7 @@ date: Nov 11 2013
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#define h_addr h_addr_list[0] /* for backward compatibility */
 
 typedef struct vector {
    void * ar;
@@ -73,5 +75,9 @@ int * strToInt(char * str);
 vector * split(char * str, char * delim);
 
 int print(const char * format, ...) __attribute__((format(printf, 1, 2)));
+
+int dataAvailible(int fd);
+int createTcpServerSocket(int port);
+int createTcpClientSocket(int port, char*hostname);
 
 #endif
