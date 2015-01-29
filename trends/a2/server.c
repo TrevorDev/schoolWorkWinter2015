@@ -6,7 +6,7 @@ void error(const char *msg)
     exit(1);
 }
 
-int createTcpSocket(int port){
+int createTcpServerSocket(int port){
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0){
         error("ERROR opening socket");
@@ -26,17 +26,9 @@ int createTcpSocket(int port){
     return sockfd;
 }
 
-int main(int argc, char **argv)
-{    
-    int sockfd = createTcpSocket(3000);
-
-    struct sockaddr_in cli_addr;
-    socklen_t clilen = sizeof(cli_addr);
-    int newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-    if (newsockfd < 0){
-        error("ERROR on accept");
-    }
-
+void* connectionHandler(void *arg)
+{
+    int newsockfd = ((int*)arg)[0];
     char buffer[256];
     bzero(buffer,256);
     int n = read(newsockfd,buffer,255);
@@ -51,6 +43,55 @@ int main(int argc, char **argv)
     }
 
     close(newsockfd);
-    close(sockfd);
+    
+    return NULL;
+}
+#define MAX_CONN 1000
+int main(int argc, char **argv)
+{    
+    queueMT * q = createQueueMT();
+    char * str = dupStr("hello");
+    pushQueueMT(q, str);
+    str = dupStr("hello123");
+    pushQueueMT(q, str);
+    str = (char*)popQueueMT(q);
+    print("%s", str);
+    free(str);
+    str = (char*)popQueueMT(q);
+    print("%s", str);
+    free(str);
+    str = dupStr("hello12322");
+    pushQueueMT(q, str);
+    str = (char*)popQueueMT(q);
+    print("%s", str);
+    free(str);
+    free(q);
+    // str = (char*)popQueueMT(q);
+    // print("%s", str);
+    // free(str);
+    // pthread_t tid[MAX_CONN];
+    // int connSocket[MAX_CONN];
+
+    // int threadCount = 0;
+    // int sockfd = createTcpServerSocket(3000);
+    // struct sockaddr_in cli_addr;
+    // socklen_t clilen = sizeof(cli_addr);
+    // while(1){
+    //     int newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+    //     if (newsockfd < 0){
+    //         error("ERROR on accept");
+    //     }
+
+    //     //spawn thread
+    //     connSocket[threadCount] = newsockfd;
+    //     int err = pthread_create(&(tid[threadCount]), NULL, &connectionHandler, &connSocket[threadCount]);
+    //     threadCount++;
+    //     if (err != 0){
+    //          printf("\ncan't create thread :[%s]", strerror(err));
+    //     }
+    //     //NEED TO JOIN
+    //     //pthread_join(tid[threadCount-1], NULL);
+    // }
+    // close(sockfd);
     return 0; 
 }

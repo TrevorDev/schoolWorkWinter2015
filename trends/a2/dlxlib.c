@@ -37,6 +37,57 @@ vector * createVector(){
 	return ret;
 }
 
+//queueMT
+queueMT * createQueueMT(){
+	queueMT * ret = (queueMT *)calloc(1, sizeof(queueMT));
+	ret->head = NULL;
+	ret->tail = NULL;
+	ret->size = 0;
+	return ret;
+}
+
+void pushQueueMT(queueMT * q, void * data){
+	pthread_mutex_lock(&(q->lock));
+
+	linkedNode * node = (linkedNode *)calloc(1, sizeof(linkedNode));
+	node->next = q->head;
+	node->prev = NULL;
+	node->data = data;
+
+	if(q->head != NULL){
+		q->head->prev = node;
+	}
+	q->head = node;
+
+	if(q->tail == NULL){
+		q->tail = node;
+	}
+
+	q->size++;
+
+	pthread_mutex_unlock(&(q->lock));
+}
+
+void * popQueueMT(queueMT * q){
+	pthread_mutex_lock(&(q->lock));
+	linkedNode * toFree = q->tail;
+	void * ret = toFree->data;
+
+	if(q->tail->prev != NULL){
+		q->tail->prev->next = NULL;
+	}
+	q->tail = q->tail->prev;
+	q->size--;
+	if(q->size == 0){
+		q->head = NULL;
+		q->tail = NULL;
+	}
+
+	free(toFree);
+	pthread_mutex_unlock(&(q->lock));
+	return ret;
+}
+
 //FILE IO
 char * fileToString(char * filename){
 	char * ret;

@@ -36,6 +36,19 @@ typedef struct vector {
    int size;
 } vector;
 
+typedef struct linkedNode {
+  	struct linkedNode * next;
+  	struct linkedNode * prev;
+  	void * data;
+} linkedNode;
+
+typedef struct queueMT {
+   linkedNode * head;
+   linkedNode * tail;
+   int size;
+   pthread_mutex_t lock;
+} queueMT;
+
 typedef struct timer {
    double start;
 } timer;
@@ -47,6 +60,10 @@ double getTime(timer t);
 double dlxlibVersion();
 
 vector * createVector();
+
+queueMT * createQueueMT();
+void pushQueueMT();
+void * popQueueMT();
 
 char * fileToString(char * filename);
 
