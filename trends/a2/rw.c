@@ -1,15 +1,12 @@
 #include "dlxlib.h"
 
-void error(const char *msg)
-{
-    perror(msg);
-    exit(0);
-}
-
 int main(int argc, char *argv[])
 {
     char buffer[256];
     int sockfd = createTcpClientSocket(3000, argv[1]);
+    if(sockfd == -1){
+        error("bad client socket");
+    }
     printf("Please enter the message: ");
     bzero(buffer,256);
     fgets(buffer,255,stdin);

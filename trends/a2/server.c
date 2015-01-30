@@ -1,13 +1,6 @@
 #include "dlxlib.h"
 #define MAX_CONN 1000
 
-
-void error(const char *msg)
-{
-    print("%s", msg);
-    exit(1);
-}
-
 void* connectionHandler(void *arg)
 {
     int newsockfd = ((int*)arg)[0];
@@ -18,7 +11,7 @@ void* connectionHandler(void *arg)
         error("ERROR reading from socket");
     }
 
-    printf("Here is the message: %s\n",buffer);
+    print("Here is the message: %s",buffer);
     n = write(newsockfd,"I got your message",18);
     if (n < 0){
         error("ERROR writing to socket");
@@ -37,30 +30,34 @@ void* runServer(void *arg)
 
     int threadCount = 0;
     int sockfd = createTcpServerSocket(3000);
+    if(sockfd == -1){
+        error("bad server socket");
+    }
     struct sockaddr_in cli_addr;
     socklen_t clilen = sizeof(cli_addr);
 
-    fd_set read_fd_set;
-    FD_ZERO (&read_fd_set);
-    FD_SET (sockfd, &read_fd_set);
-    FD_SET (stopfd, &read_fd_set);
-    int maxfd = stopfd > sockfd ? stopfd : sockfd;
+    
+    print("server started");
     while(1){
+        //weird it breaks if this stuff is outside the while????
+        fd_set read_fd_set;
+        FD_ZERO (&read_fd_set);
+        FD_SET (sockfd, &read_fd_set);
+        FD_SET (stopfd, &read_fd_set);
+        int maxfd = stopfd > sockfd ? stopfd : sockfd;
+
+        //print("selecting");
         if(select(maxfd+1, &read_fd_set, NULL, NULL, NULL) == -1){
             error("bad select");
         }
         if(dataAvailible(stopfd)){
-            error("how");
             char buf[5];
             read(stopfd, buf, 5);
-            print("%s", buf);
-            //error("done");
-            //exit
+            //print("%s", buf);
             close(sockfd);
             pthread_exit(0);
             return NULL;
-        }        
-        print("hit");
+        }
         int newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
         if (newsockfd < 0){
             error("ERROR on accept");
@@ -89,12 +86,12 @@ int main(int argc, char **argv)
     if (err != 0){
          printf("\ncan't create thread :[%s]", strerror(err));
     }
-    print("server started");
+    
     int c = 0;
     while(c!='q'){
         c=getchar();
     }
-    if (write(fd[1], "stop\n", 5) != 5) {
+    if (write(fd[1], "stop\0", 5) != 5) {
         error("unable to write");
     }
     pthread_join(serverThread, NULL);

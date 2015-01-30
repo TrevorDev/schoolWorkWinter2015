@@ -75,6 +75,7 @@ int * strToInt(char * str);
 vector * split(char * str, char * delim);
 
 int print(const char * format, ...) __attribute__((format(printf, 1, 2)));
+void error(const char *msg);
 
 int dataAvailible(int fd);
 int createTcpServerSocket(int port);
