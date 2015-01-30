@@ -37,22 +37,39 @@ vector * createVector(){
 	return ret;
 }
 
-//queueMT
-queueMT * createQueueMT(){
-	queueMT * ret = (queueMT *)calloc(1, sizeof(queueMT));
+//linkedMT
+linkedMT * createLinkedMT(){
+	linkedMT * ret = (linkedMT *)calloc(1, sizeof(linkedMT));
 	ret->head = NULL;
 	ret->tail = NULL;
 	ret->size = 0;
 	return ret;
 }
 
-void pushQueueMT(queueMT * q, void * data){
+linkedMT * findLinkedMT(linkedMT * q, char * key){
+	pthread_mutex_lock(&(q->lock));
+	void * retData = NULL;
+	linkedNode * place = q->head;
+
+	while(place!=NULL){
+		if(strcmp(place->key, key) == 0){
+			retData = place->data;
+		}
+		place = place->next;
+	}
+	
+	pthread_mutex_unlock(&(q->lock));
+	return retData;
+}
+
+void pushLinkedMT(linkedMT * q, void * data, char * key){
 	pthread_mutex_lock(&(q->lock));
 
 	linkedNode * node = (linkedNode *)calloc(1, sizeof(linkedNode));
 	node->next = q->head;
 	node->prev = NULL;
 	node->data = data;
+	node->key = dupStr(key);
 
 	if(q->head != NULL){
 		q->head->prev = node;
@@ -68,7 +85,7 @@ void pushQueueMT(queueMT * q, void * data){
 	pthread_mutex_unlock(&(q->lock));
 }
 
-void * popQueueMT(queueMT * q){
+void * popLinkedMT(linkedMT * q){
 	pthread_mutex_lock(&(q->lock));
 	linkedNode * toFree = q->tail;
 	void * ret = toFree->data;
@@ -113,6 +130,9 @@ char * strAdd(char * a,char * b){
 }
 
 char * dupStr(char * str){
+	if(str == NULL){
+		return NULL;
+	}
 	char * ret = (char *)calloc(strlen(str)+1, sizeof(char));
 	strcpy(ret, str);
 	return ret;
