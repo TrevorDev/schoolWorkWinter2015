@@ -65,7 +65,9 @@ double dlxlibVersion();
 vector * createVector();
 
 linkedMT * createLinkedMT();
-linkedMT * findLinkedMT(linkedMT * q, char * key);
+void * findLinkedMT(linkedMT * q, char * key);
+void * tailLinkedMT(linkedMT * q);
+void * removeLinkedMT(linkedMT * q, char * key);
 void pushLinkedMT();
 void * popLinkedMT();
 
@@ -74,6 +76,7 @@ char * fileToString(char * filename);
 char * dupStr(char * str);
 char * strAdd(char * a,char * b);
 int * strToInt(char * str);
+char * intToStr(int x);
 vector * split(char * str, char * delim);
 
 int print(const char * format, ...) __attribute__((format(printf, 1, 2)));

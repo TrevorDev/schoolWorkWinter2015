@@ -46,7 +46,7 @@ linkedMT * createLinkedMT(){
 	return ret;
 }
 
-linkedMT * findLinkedMT(linkedMT * q, char * key){
+void * findLinkedMT(linkedMT * q, char * key){
 	pthread_mutex_lock(&(q->lock));
 	void * retData = NULL;
 	linkedNode * place = q->head;
@@ -54,6 +54,47 @@ linkedMT * findLinkedMT(linkedMT * q, char * key){
 	while(place!=NULL){
 		if(strcmp(place->key, key) == 0){
 			retData = place->data;
+			break;
+		}
+		place = place->next;
+	}
+	
+	pthread_mutex_unlock(&(q->lock));
+	return retData;
+}
+
+void * tailLinkedMT(linkedMT * q){
+	pthread_mutex_lock(&(q->lock));
+	void * retData = NULL;
+	if(q->tail){
+		retData = q->tail->data;
+	}
+	pthread_mutex_unlock(&(q->lock));
+	return retData;
+}
+
+void * removeLinkedMT(linkedMT * q, char * key){
+	pthread_mutex_lock(&(q->lock));
+	void * retData = NULL;
+	linkedNode * place = q->head;
+
+	while(place!=NULL){
+		if(strcmp(place->key, key) == 0){
+			retData = place->data;
+			if(place->prev == NULL){
+				q->head = place->next;
+			}else{
+				place->prev->next = place->next;
+			}
+
+			if(place->next == NULL){
+				q->tail = place->prev;
+			}else{
+				place->next->prev = place->prev;
+			}
+			free(place->key);
+			free(place);
+			break;
 		}
 		place = place->next;
 	}
@@ -99,7 +140,7 @@ void * popLinkedMT(linkedMT * q){
 		q->head = NULL;
 		q->tail = NULL;
 	}
-
+	free(toFree->key);
 	free(toFree);
 	pthread_mutex_unlock(&(q->lock));
 	return ret;
@@ -173,6 +214,12 @@ int * strToInt(char * str){
 		*ret = num;
 	}
 	
+	return ret;
+}
+
+char * intToStr(int x){
+	char * ret = malloc(sizeof(char)*15);//max return string size;
+	sprintf(ret, "%d", x);
 	return ret;
 }
 
