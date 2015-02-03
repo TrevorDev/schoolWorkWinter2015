@@ -1,0 +1,12 @@
+#define TOKEN_SET 1
+#define TOKEN_CHAR 2
+#define TOKEN_INT 3
+#define TOKEN_REAL 4
+#define TOKEN_STR 5
+#define TOKEN_CAR 6
+#define TOKEN_CDR 7
+#define TOKEN_LPAREN 8
+#define TOKEN_RPAREN 9
+#define TOKEN_PLUS 10
+#define TOKEN_SEMICOLIN 11
+#define TOKEN_FILE_END 12
