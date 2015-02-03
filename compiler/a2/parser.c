@@ -3,6 +3,11 @@
 #include "scanner.h"
 #include "tokens.h"
 
+typedef struct grammer {
+   void * ar;
+   int size;
+} grammer;
+
 int main(int argc, char **argv)
 {
 	int x = yylex();
