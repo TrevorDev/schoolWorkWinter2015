@@ -4,9 +4,13 @@
 #include "tokens.h"
 
 typedef struct grammer {
-   void * ar;
-   int size;
+	int id;
+	linkedMT * orList;
 } grammer;
+
+typedef struct grammerList {
+	linkedMT * orList;
+} grammerList;
 
 int main(int argc, char **argv)
 {
