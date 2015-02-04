@@ -32,16 +32,20 @@ int main(int argc, char **argv)
 
     //Bottom half of sorted array is small sum O(n)
     int half = numberOfNums/2;
+    int numbersCounted = 0;
     double smallTotal = 0;
     double largeTotal = 0;
     for(int i = 0;i<100;i++){
-        if(half > 0){
-            if(half < x[i]){
-                smallTotal += (i+1)*half;
-                half = 0;
+        if(numbersCounted < half){
+            if(numbersCounted + x[i] > half){
+                int sC = half - numbersCounted;
+                int lC = numbersCounted + x[i] -half;
+                smallTotal += (i+1)*sC;
+                largeTotal += (i+1)*lC;
+                numbersCounted += smallTotal;
             }else{
                 smallTotal += (i+1)*x[i];
-                half = half - x[i];
+                numbersCounted += x[i];
             }
         }else{
             //end of small sublist
@@ -51,8 +55,12 @@ int main(int argc, char **argv)
 
     end = clock();
     totalTime = (double)(end - begin) / CLOCKS_PER_SEC;
-    //printf("%f  %f\n",largeTotal, smallTotal);
+    //printf("%f  %f %d\n",largeTotal, smallTotal, half);
     printf("Sum Dif = %f\nRun Time = %f seconds\n", largeTotal - smallTotal, totalTime);
+    printf("Freq 15 = %d\n", x[14]);
+    printf("Freq 27 = %d\n", x[26]);
+    printf("Freq 54 = %d\n", x[53]);
+    printf("Freq 89 = %d\n", x[88]);
     return 0;
 }
 
