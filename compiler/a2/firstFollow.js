@@ -8,7 +8,7 @@ var createEnum = function(list){
 	return ret;
 }
 
-var nt = createEnum(["STMTS", "STMTEND", "STMT", "ASSIGN", "ADDEXPR", "ADDEXPRA", "VAR", "LISTEXPR", "ITEMS", "ITEMEND", "ITEM"])
+var nt = createEnum(["STMTS", "STMTEND", "STMT", "ASSIGN", "ADDEXPR", "ADDEXPRA", "VAR", "LISTEXPR", "ITEMS", "ITEM"])
 var t = createEnum(["EMPTY", "SET", "SEMI", "CHAR", "STR", "INT", "REAL", "CAR", "CDR", "PLUS", "LPAREN", "RPAREN"])
 
 
@@ -42,6 +42,41 @@ var firstOf = function(x){
 	return ret;
 }
 
+var followOf = function(x, done){
+	var ret = []
+	if(!done){
+		done = []
+	}
+	done.push(x)
+	for(var key in g){
+		for(var i = 0;i<g[key].length;i++){
+			for(var j = 0;j<g[key][i].length;j++){
+				if(g[key][i][j] == x){
+					var k = j+1
+					while(1){
+						if(k == g[key][i].length){
+							if(done.indexOf(key) == -1){
+								var f = followOf(key);
+								ret = ret.concat(f);
+							}
+							break;
+						}
+						var f = firstOf(g[key][i][k]);
+						var filtered = filterEmpty(f);
+						ret = ret.concat(filtered);
+						if(f.indexOf(t.EMPTY) == -1){
+							break;
+						}
+						k++
+					}
+				}
+			}
+		}
+	}
+	ret = makeUniq(ret);
+	return ret;
+}
+
 var makeUniq = function(ar){
 	var ret = [];
 	for(var i = 0;i<ar.length;i++){
@@ -52,7 +87,19 @@ var makeUniq = function(ar){
 	return ret;
 }
 
+var filterEmpty = function(ar){
+	var ret = [];
+	for(var i = 0;i<ar.length;i++){
+		if(ar[i] != t.EMPTY){
+			ret.push(ar[i])
+		}
+	}
+	return ret;
+}
+
 for(var key in g){
 	console.log(key);
 	console.log(firstOf(key))
+	console.log(followOf(key))
 }
+//console.log(followOf(nt.ITEMS));
