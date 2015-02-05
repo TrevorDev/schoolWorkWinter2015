@@ -8,23 +8,22 @@ var createEnum = function(list){
 	return ret;
 }
 
-var nt = createEnum(["STMTS", "STMTEND", "PRESEMI", "STMT", "ASSIGN", "ADDEXPR", "ADDEXPRP", "ADDEXPRA", "ADDEXPRAP", "VAR", "LISTEXPR", "ITEMS", "ITEMEND","ITEM"])
+var nt = createEnum(["STMTS", "STMTEND", "STMT", "ASSIGN", "ADDEXPR", "ADDEXPRP", "ADDEXPRA", "ADDEXPRAP", "VAR", "LISTEXPR", "ITEMS", "ITEMEND","ITEM"])
 var t = createEnum(["EMPTY", "SET", "SEMI", "CHAR", "STR", "INT", "REAL", "CAR", "CDR", "PLUS", "LPAREN", "RPAREN"])
 
 g[nt.STMTS] = [[nt.STMT, nt.STMTEND]]
 g[nt.STMTEND] = [[nt.STMT, nt.STMTEND], [t.EMPTY]]
-g[nt.PRESEMI] = [[nt.ASSIGN], [nt.ADDEXPR]]
-g[nt.STMT] = [[nt.PRESEMI, t.SEMI]]
+g[nt.STMT] = [[nt.ASSIGN, t.SEMI], [nt.ADDEXPR, t.SEMI]]
 g[nt.ASSIGN] = [[t.SET, nt.VAR, nt.ADDEXPR]]
 g[nt.ADDEXPR] = [[nt.ADDEXPRA, nt.ADDEXPRP]]
 g[nt.ADDEXPRP] = [[t.PLUS, nt.ADDEXPR], [t.EMPTY]]
 g[nt.ADDEXPRA] = [[nt.LISTEXPR, nt.ADDEXPRAP]]
 g[nt.ADDEXPRAP] = [[t.PLUS, nt.ADDEXPRA],[t.EMPTY]]
-g[nt.LISTEXPR] = [[nt.VAR],[t.LPAREN, nt.ITEMS, t.RPAREN], [t.CDR, nt.LISTEXPR]]
+g[nt.LISTEXPR] = [[nt.VAR],[t.LPAREN, nt.ITEMS], [t.CDR, nt.LISTEXPR]]
 g[nt.VAR] = [[t.CHAR]]
 g[nt.ITEMS] = [[nt.ITEM, nt.ITEMEND]]
-g[nt.ITEMEND] = [[nt.ITEMS], [t.EMPTY]]
-g[nt.ITEM] = [[nt.ADDEXPR], [t.CAR, nt.LISTEXPR], [t.STR], [t.INT], [t.REAL], [t.EMPTY]]
+g[nt.ITEMEND] = [[nt.ITEM, nt.ITEMEND], [t.RPAREN]]
+g[nt.ITEM] = [[nt.ADDEXPR], [t.CAR, nt.LISTEXPR], [t.STR], [t.INT], [t.REAL]]
 
 // var nt = createEnum(["Z", "X", "Y"])
 // var t = createEnum(["a", "c", "d", "EMPTY"])
@@ -178,15 +177,15 @@ for(var nonTerm in nt){
 }
 
 for(var nonTerm in t){
-	if(nonTerm != t.EMPTY){
+	//if(nonTerm != t.EMPTY){
 		addToPt(nonTerm)
-	}
+	//}
 }
 var count = 0;
 for(var key in pt){
 	var ar = makeUniq(pt[key]);
 	
-	if(ar.length > 0){
+	if(ar.length > 1){
 		console.log(key)
 		console.log(ar)
 		count++;
