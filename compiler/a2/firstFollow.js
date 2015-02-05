@@ -134,10 +134,8 @@ var addToPt = function(sym){
 				for(var key in g){
 					for(var j = 0;j<g[key].length;j++){
 						for(var k = 0;k<g[key][j].length;k++){
-							for(var l = 0;l<g[key][j][k].length;l++){
-								if(g[key][j][k][l] == sym){
-									pt[key + " " + first[i]].push(g[key][j])
-								}
+							if(g[key][j][k] == sym){
+								pt[key + " " + first[i]].push(g[key][j])
 							}
 						}
 					}
@@ -147,12 +145,10 @@ var addToPt = function(sym){
 				for(var key in g){
 					for(var j = 0;j<g[key].length;j++){
 						for(var k = 0;k<g[key][j].length;k++){
-							for(var l = 0;l<g[key][j][k].length;l++){
-								if(g[key][j][k][l] == sym){
-									var follow = followOf(key);
-									for(var m = 0;m<follow.length;m++){
-										pt[key + " " + follow[m]].push(g[key][j])
-									}
+							if(g[key][j][k] == sym){
+								var follow = followOf(key);
+								for(var m = 0;m<follow.length;m++){
+									pt[key + " " + follow[m]].push(g[key][j])
 								}
 							}
 						}
