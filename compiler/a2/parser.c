@@ -15,6 +15,7 @@ void itemend();
 void items();
 void var();
 void listexpr();
+void printToken();
 int curTok = 0;
 
 int main(int argc, char **argv)
@@ -42,6 +43,8 @@ void stmts(){
 			stmtend();
 			break;
 		default:
+			printToken(curTok);
+			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
@@ -56,6 +59,8 @@ void stmtend(){
 			stmtend();
 			break;
 		default:
+			printToken(curTok);
+			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
@@ -72,6 +77,8 @@ void stmt(){
 			addexpr();
 			break;
 		default:
+			printToken(curTok);
+			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
@@ -84,6 +91,8 @@ void assign(){
 			addexpr();
 			break;
 		default:
+			printToken(curTok);
+			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
@@ -97,6 +106,8 @@ void addexpr(){
 			addexpra();
 			break;
 		default:
+			printToken(curTok);
+			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
@@ -112,6 +123,8 @@ void addexpra(){
 			addexpra();
 			break;
 		default:
+			printToken(curTok);
+			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
@@ -122,6 +135,8 @@ void var(){
 			consume(TOKEN_CHAR);
 			break;
 		default:
+			printToken(curTok);
+			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
@@ -140,6 +155,8 @@ void listexpr(){
 			items();
 			break;
 		default:
+			printToken(curTok);
+			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
@@ -157,6 +174,8 @@ void items(){
 			itemend();
 			break;
 		default:
+			printToken(curTok);
+			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
@@ -177,6 +196,8 @@ void itemend(){
 		consume(TOKEN_RPAREN);
 		break;
 		default:
+			printToken(curTok);
+			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
@@ -206,17 +227,66 @@ void item(){
 			addexpr();
 			break;
 		default:
+			printToken(curTok);
+			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
 
 void consume(int x){
+	printToken(x);
 	if(curTok == x){
 		curTok = yylex();
 		if(curTok == TOKEN_FILE_END){
 			error("DONE");
 		}
 	}else{
+		printToken(curTok);
+		printf("%s\n", __func__);
 		error("PARSE ERROR");
 	}
+}
+
+void printToken(int t){
+	switch(curTok){
+		case TOKEN_SET:
+	    print("TOKEN_SET");
+	    break;
+		case TOKEN_CHAR:
+	    print("TOKEN_CHAR");
+	    break;
+		case TOKEN_INT:
+	    print("TOKEN_INT");
+	    break;
+		case TOKEN_REAL:
+	    print("TOKEN_REAL");
+	    break;
+		case TOKEN_STR:
+	    print("TOKEN_STR");
+	    break;
+		case TOKEN_CAR:
+	    print("TOKEN_CAR");
+	    break;
+		case TOKEN_CDR:
+	    print("TOKEN_CDR");
+	    break;
+		case TOKEN_LPAREN:
+	    print("TOKEN_LPAREN");
+	    break;
+		case TOKEN_RPAREN:
+	    print("TOKEN_RPAREN");
+	    break;
+		case TOKEN_PLUS:
+	    print("TOKEN_PLUS");
+	    break;
+		case TOKEN_SEMICOLIN:
+	    print("TOKEN_SEMICOLIN");
+	    break;
+		case TOKEN_FILE_END:
+	    print("TOKEN_FILE_END");
+	    break;
+		default:
+			error("unknownToken");
+	}
+	
 }
