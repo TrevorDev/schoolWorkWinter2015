@@ -8,7 +8,7 @@ var createEnum = function(list){
 	return ret;
 }
 
-var nt = createEnum(["STMTS", "STMTEND", "PRESEMI", "STMT", "ASSIGN", "ADDEXPR", "ADDEXPRA", "VAR", "LISTEXPR", "ITEMS", "ITEM"])
+var nt = createEnum(["STMTS", "STMTEND", "PRESEMI", "STMT", "ASSIGN", "ADDEXPR", "ADDEXPRP", "ADDEXPRA", "ADDEXPRAP", "VAR", "LISTEXPR", "ITEMS", "ITEMEND","ITEM"])
 var t = createEnum(["EMPTY", "SET", "SEMI", "CHAR", "STR", "INT", "REAL", "CAR", "CDR", "PLUS", "LPAREN", "RPAREN"])
 
 g[nt.STMTS] = [[nt.STMT, nt.STMTEND]]
@@ -16,12 +16,15 @@ g[nt.STMTEND] = [[nt.STMT, nt.STMTEND], [t.EMPTY]]
 g[nt.PRESEMI] = [[nt.ASSIGN], [nt.ADDEXPR]]
 g[nt.STMT] = [[nt.PRESEMI, t.SEMI]]
 g[nt.ASSIGN] = [[t.SET, nt.VAR, nt.ADDEXPR]]
-g[nt.ADDEXPR] = [[nt.ADDEXPRA, t.PLUS, nt.ADDEXPR], [nt.ADDEXPRA]]
-g[nt.ADDEXPRA] = [[nt.LISTEXPR, t.PLUS, nt.ADDEXPRA],[nt.LISTEXPR]]
+g[nt.ADDEXPR] = [[nt.ADDEXPRA, nt.ADDEXPRP]]
+g[nt.ADDEXPRP] = [[t.PLUS, nt.ADDEXPR], [t.EMPTY]]
+g[nt.ADDEXPRA] = [[nt.LISTEXPR, nt.ADDEXPRAP]]
+g[nt.ADDEXPRAP] = [[t.PLUS, nt.ADDEXPRA],[t.EMPTY]]
 g[nt.LISTEXPR] = [[nt.VAR],[t.LPAREN, nt.ITEMS, t.RPAREN], [t.CDR, nt.LISTEXPR]]
 g[nt.VAR] = [[t.CHAR]]
-g[nt.ITEMS] = [[nt.ITEM, nt.ITEMS], [t.EMPTY]]
-g[nt.ITEM] = [[nt.ADDEXPR], [t.CAR, nt.LISTEXPR], [t.STR], [t.INT], [t.REAL]]
+g[nt.ITEMS] = [[nt.ITEM, nt.ITEMEND]]
+g[nt.ITEMEND] = [[nt.ITEMS], [t.EMPTY]]
+g[nt.ITEM] = [[nt.ADDEXPR], [t.CAR, nt.LISTEXPR], [t.STR], [t.INT], [t.REAL], [t.EMPTY]]
 
 // var nt = createEnum(["Z", "X", "Y"])
 // var t = createEnum(["a", "c", "d", "EMPTY"])
@@ -42,7 +45,7 @@ var firstOf = function(x, done){
 	for(var i = 0;i<g[x].length;i++){
 		for(var j = 0;j<g[x][i].length;j++){
 			if(done.indexOf(g[x][i][j]) == -1){
-				var f = firstOf(g[x][i][j]);
+				var f = firstOf(g[x][i][j], done);
 				ret = ret.concat(filterEmpty(f));
 				if(f.indexOf(t.EMPTY) == -1){
 					break;
@@ -72,7 +75,7 @@ var followOf = function(x, done){
 					while(1){
 						if(k == g[key][i].length){
 							if(done.indexOf(key) == -1){
-								var f = followOf(key);
+								var f = followOf(key, done);
 								ret = ret.concat(f);
 							}
 							break;
@@ -138,6 +141,10 @@ var addToPt = function(sym){
 							if(g[key][j][k] == sym){
 								pt[key + " " + first[i]].push(g[key][j])
 							}
+							//ONLYS TARTING WITH SYM
+							if(firstOf(g[key][j][k]).indexOf(t.EMPTY) == -1){
+								break;
+							}
 						}
 					}
 				}
@@ -145,12 +152,19 @@ var addToPt = function(sym){
 				//console.log(sym + "hit");
 				for(var key in g){
 					for(var j = 0;j<g[key].length;j++){
-						for(var k = 0;k<g[key][j].length;k++){
+						for(var k = g[key][j].length-1;k>=0;k--){
 							if(g[key][j][k] == sym){
 								var follow = followOf(key);
 								for(var m = 0;m<follow.length;m++){
+									// if(key + " " + follow[m]=="ITEM CHAR"){
+									// 	console.log(sym, "BAD", g[key][j])
+									// }
 									pt[key + " " + follow[m]].push(g[key][j])
 								}
+							}
+							//ONLY ENDING WITH SYM which is why k-- above
+							if(firstOf(g[key][j][k]).indexOf(t.EMPTY) == -1){
+								break;
 							}
 						}
 					}
@@ -164,13 +178,15 @@ for(var nonTerm in nt){
 }
 
 for(var nonTerm in t){
-	addToPt(nonTerm)
+	if(nonTerm != t.EMPTY){
+		addToPt(nonTerm)
+	}
 }
 var count = 0;
 for(var key in pt){
 	var ar = makeUniq(pt[key]);
 	
-	if(ar.length > 1){
+	if(ar.length > 0){
 		console.log(key)
 		console.log(ar)
 		count++;
