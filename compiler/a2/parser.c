@@ -3,11 +3,24 @@
 #include "scanner.h"
 #include "tokens.h"
 
+void stmts();
+void stmtend();
+void stmt();
+void assign();
+void consume(int x);
+void addexpr();
+void addexpra();
+void item();
+void itemend();
+void items();
+void var();
+void listexpr();
 int curTok = 0;
 
 int main(int argc, char **argv)
 {
 	curTok = yylex();
+	stmts();
 	// int x = yylex();
 	// while(x != TOKEN_FILE_END){
 	// 	print("%d", x);
@@ -160,7 +173,7 @@ void itemend(){
 			item();
 			itemend();
 			break;
-		case TOKEN_LPAREN:
+		case TOKEN_RPAREN:
 		consume(TOKEN_RPAREN);
 		break;
 		default:
@@ -194,5 +207,16 @@ void item(){
 			break;
 		default:
 			error("PARSE ERROR");
+	}
+}
+
+void consume(int x){
+	if(curTok == x){
+		curTok = yylex();
+		if(curTok == TOKEN_FILE_END){
+			error("DONE");
+		}
+	}else{
+		error("PARSE ERROR");
 	}
 }
