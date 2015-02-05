@@ -121,10 +121,56 @@ var filterEmpty = function(ar){
 var pt = [];
 for(var nonTerm in nt){
 	for(var term in t){
-		pt[nonTerm + " " + term] = [];
+		if(term != t.EMPTY){
+			pt[nonTerm + " " + term] = [];
+		}
 	}
 }
 
+var addToPt = function(sym){
+		var first = firstOf(sym)
+		for(var i = 0;i<first.length;i++){
+			if(first[i] != t.EMPTY){
+				for(var key in g){
+					for(var j = 0;j<g[key].length;j++){
+						for(var k = 0;k<g[key][j].length;k++){
+							for(var l = 0;l<g[key][j][k].length;l++){
+								if(g[key][j][k][l] == sym){
+									pt[key + " " + first[i]].push(g[key][j])
+								}
+							}
+						}
+					}
+				}
+			}else{
+				//console.log(sym + "hit");
+				for(var key in g){
+					for(var j = 0;j<g[key].length;j++){
+						for(var k = 0;k<g[key][j].length;k++){
+							for(var l = 0;l<g[key][j][k].length;l++){
+								if(g[key][j][k][l] == sym){
+									var follow = followOf(key);
+									for(var m = 0;m<follow.length;m++){
+										pt[key + " " + follow[m]].push(g[key][j])
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+}
+
+for(var nonTerm in nt){
+	addToPt(nonTerm)
+}
+
+for(var nonTerm in t){
+	addToPt(nonTerm)
+}
+
 for(var key in pt){
-//console.log(key)
+console.log(key)
+console.log(makeUniq(pt[key]))
 }
