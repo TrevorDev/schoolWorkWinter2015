@@ -8,26 +8,27 @@ var createEnum = function(list){
 	return ret;
 }
 
-// var nt = createEnum(["STMTS", "STMTEND", "STMT", "ASSIGN", "ADDEXPR", "ADDEXPRA", "VAR", "LISTEXPR", "ITEMS", "ITEM"])
-// var t = createEnum(["EMPTY", "SET", "SEMI", "CHAR", "STR", "INT", "REAL", "CAR", "CDR", "PLUS", "LPAREN", "RPAREN"])
+var nt = createEnum(["STMTS", "STMTEND", "PRESEMI", "STMT", "ASSIGN", "ADDEXPR", "ADDEXPRA", "VAR", "LISTEXPR", "ITEMS", "ITEM"])
+var t = createEnum(["EMPTY", "SET", "SEMI", "CHAR", "STR", "INT", "REAL", "CAR", "CDR", "PLUS", "LPAREN", "RPAREN"])
 
-// g[nt.STMTS] = [[nt.STMT, nt.STMTEND]]
-// g[nt.STMTEND] = [[nt.STMT, nt.STMTEND], [t.EMPTY]]
-// g[nt.STMT] = [[nt.ASSIGN, t.SEMI], [nt.ADDEXPR, t.SEMI]]
-// g[nt.ASSIGN] = [[t.SET, nt.VAR, nt.ADDEXPR]]
-// g[nt.ADDEXPR] = [[nt.ADDEXPRA, t.PLUS, nt.ADDEXPR], [nt.ADDEXPRA]]
-// g[nt.ADDEXPRA] = [[nt.LISTEXPR, t.PLUS, nt.ADDEXPRA],[nt.LISTEXPR]]
-// g[nt.LISTEXPR] = [[nt.VAR],[t.LPAREN, nt.ITEMS, t.RPAREN], [t.CDR, nt.LISTEXPR]]
-// g[nt.VAR] = [[t.CHAR]]
-// g[nt.ITEMS] = [[nt.ITEM, nt.ITEMS], [t.EMPTY]]
-// g[nt.ITEM] = [[nt.ADDEXPR], [t.CAR, nt.LISTEXPR], [t.STR], [t.INT], [t.REAL]]
+g[nt.STMTS] = [[nt.STMT, nt.STMTEND]]
+g[nt.STMTEND] = [[nt.STMT, nt.STMTEND], [t.EMPTY]]
+g[nt.PRESEMI] = [[nt.ASSIGN], [nt.ADDEXPR]]
+g[nt.STMT] = [[nt.PRESEMI, t.SEMI]]
+g[nt.ASSIGN] = [[t.SET, nt.VAR, nt.ADDEXPR]]
+g[nt.ADDEXPR] = [[nt.ADDEXPRA, t.PLUS, nt.ADDEXPR], [nt.ADDEXPRA]]
+g[nt.ADDEXPRA] = [[nt.LISTEXPR, t.PLUS, nt.ADDEXPRA],[nt.LISTEXPR]]
+g[nt.LISTEXPR] = [[nt.VAR],[t.LPAREN, nt.ITEMS, t.RPAREN], [t.CDR, nt.LISTEXPR]]
+g[nt.VAR] = [[t.CHAR]]
+g[nt.ITEMS] = [[nt.ITEM, nt.ITEMS], [t.EMPTY]]
+g[nt.ITEM] = [[nt.ADDEXPR], [t.CAR, nt.LISTEXPR], [t.STR], [t.INT], [t.REAL]]
 
-var nt = createEnum(["Z", "X", "Y"])
-var t = createEnum(["a", "c", "d", "EMPTY"])
+// var nt = createEnum(["Z", "X", "Y"])
+// var t = createEnum(["a", "c", "d", "EMPTY"])
 
-g[nt.Z] = [[t.d], [nt.X, nt.Y, nt.Z]]
-g[nt.Y] = [[t.c], [t.EMPTY]]
-g[nt.X] = [[nt.Y], [t.a]]
+// g[nt.Z] = [[t.d], [nt.X, nt.Y, nt.Z]]
+// g[nt.Y] = [[t.c], [t.EMPTY]]
+// g[nt.X] = [[nt.Y], [t.a]]
 
 var firstOf = function(x, done){
 	var ret = []
@@ -165,8 +166,14 @@ for(var nonTerm in nt){
 for(var nonTerm in t){
 	addToPt(nonTerm)
 }
-
+var count = 0;
 for(var key in pt){
-console.log(key)
-console.log(makeUniq(pt[key]))
+	var ar = makeUniq(pt[key]);
+	
+	if(ar.length > 1){
+		console.log(key)
+		console.log(ar)
+		count++;
+	}
 }
+console.log(count)
