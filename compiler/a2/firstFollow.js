@@ -193,7 +193,7 @@ var count = 0;
 for(var key in pt){
 	var ar = makeUniq(pt[key]);
 	
-	if(ar.length > 1){
+	if(ar.length > 0){
 		console.log(key)
 		console.log(ar)
 		count++;

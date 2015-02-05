@@ -10,6 +10,8 @@ void assign();
 void consume(int x);
 void addexpr();
 void addexpra();
+void iaddexpr();
+void iaddexpra();
 void item();
 void itemend();
 void items();
@@ -69,7 +71,6 @@ void stmt(){
 	switch(curTok){
 		case TOKEN_SET:
 			assign();
-			consume(TOKEN_SEMICOLIN);
 			break;
 		case TOKEN_CHAR:
 		case TOKEN_CDR:
@@ -129,6 +130,45 @@ void addexpra(){
 	}
 }
 
+void iaddexpr(){
+	switch(curTok){
+		case TOKEN_CHAR:
+		case TOKEN_CDR:
+		case TOKEN_LPAREN:
+			listexpr();
+			iaddexpra();
+			break;
+		default:
+			printToken(curTok);
+			printf("%s\n", __func__);
+			error("PARSE ERROR");
+	}
+}
+
+void iaddexpra(){
+	switch(curTok){
+		case TOKEN_CHAR:
+		case TOKEN_STR:
+		case TOKEN_INT:
+		case TOKEN_REAL:
+		case TOKEN_CAR:
+		case TOKEN_CDR:
+		case TOKEN_LPAREN:
+		case TOKEN_RPAREN:
+			itemend();
+			break;
+		case TOKEN_PLUS:
+			consume(TOKEN_PLUS);
+			listexpr();
+			iaddexpra();
+			break;
+		default:
+			printToken(curTok);
+			printf("%s\n", __func__);
+			error("PARSE ERROR");
+	}
+}
+
 void var(){
 	switch(curTok){
 		case TOKEN_CHAR:
@@ -163,13 +203,10 @@ void listexpr(){
 
 void items(){
 	switch(curTok){
-		case TOKEN_CHAR:
 		case TOKEN_STR:
 		case TOKEN_INT:
 		case TOKEN_REAL:
 		case TOKEN_CAR:
-		case TOKEN_CDR:
-		case TOKEN_LPAREN:
 			item();
 			itemend();
 			break;
@@ -182,13 +219,15 @@ void items(){
 
 void itemend(){
 	switch(curTok){
+		case TOKEN_CDR:
 		case TOKEN_CHAR:
+		case TOKEN_LPAREN:
+			iaddexpr();
+			break;
 		case TOKEN_STR:
 		case TOKEN_INT:
 		case TOKEN_REAL:
 		case TOKEN_CAR:
-		case TOKEN_CDR:
-		case TOKEN_LPAREN:
 			item();
 			itemend();
 			break;
@@ -204,9 +243,6 @@ void itemend(){
 
 void item(){
 	switch(curTok){
-		case TOKEN_CHAR:
-			addexpr();
-			break;
 		case TOKEN_STR:
 			consume(TOKEN_STR);
 			break;
@@ -219,12 +255,6 @@ void item(){
 		case TOKEN_CAR:
 			consume(TOKEN_CAR);
 			listexpr();
-			break;
-		case TOKEN_CDR:
-			addexpr(); // ERROR?
-			break;
-		case TOKEN_LPAREN:
-			addexpr();
 			break;
 		default:
 			printToken(curTok);

@@ -1,1 +1,1 @@
-set a ( 1 2 c blah ) ;
+set b ( a b ) ;
