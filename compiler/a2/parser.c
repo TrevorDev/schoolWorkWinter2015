@@ -5,6 +5,7 @@
 
 void stmts();
 void stmtend();
+void stmtendend();
 void stmt();
 void assign();
 void consume(int x);
@@ -24,6 +25,7 @@ int main(int argc, char **argv)
 {
 	curTok = yylex();
 	stmts();
+	print("Matches grammer!");
 	// int x = yylex();
 	// while(x != TOKEN_FILE_END){
 	// 	printToken(x);
@@ -43,7 +45,7 @@ void stmts(){
 			stmtend();
 			break;
 		default:
-			printf("ERROR: %s\n", __func__);
+			printf("ERROR: %s LINE %d\n", __func__);
 			printToken(curTok);
 			error("PARSE ERROR");
 	}
@@ -57,6 +59,24 @@ void stmtend(){
 		case TOKEN_CDR:
 		case TOKEN_LPAREN:
 			stmt();
+			stmtendend();
+			break;
+		default:
+			printf("ERROR: %s\n", __func__);
+			printToken(curTok);
+			error("PARSE ERROR");
+	}
+}
+
+void stmtendend(){
+	printf("ENTERING %s\n", __func__);
+	switch(curTok){
+		case TOKEN_FILE_END:
+			break;
+		case TOKEN_SET:
+		case TOKEN_CHAR:
+		case TOKEN_CDR:
+		case TOKEN_LPAREN:
 			stmtend();
 			break;
 		default:
@@ -285,9 +305,9 @@ void consume(int x){
 	printToken(x);
 	if(curTok == x){
 		curTok = yylex();
-		if(curTok == TOKEN_FILE_END){
-			error("DONE");
-		}
+		// if(curTok == TOKEN_FILE_END){
+		// 	error("DONE");
+		// }
 	}else{
 		printToken(curTok);
 		printf("ERROR: %s\n", __func__);
