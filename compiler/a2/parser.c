@@ -211,6 +211,9 @@ void listexpr(){
 void items(){
 	printf("ENTERING %s\n", __func__);
 	switch(curTok){
+		case TOKEN_RPAREN:
+			consume(TOKEN_RPAREN);
+			break;
 		case TOKEN_LPAREN:
 		case TOKEN_CDR:
 		case TOKEN_CHAR:

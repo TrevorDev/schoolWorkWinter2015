@@ -1,1 +1,9 @@
+set a ( 1 2 c blah ) ;
+set b ( a b ) ;
 set c cdr a + cdr b + ( ) ;
+c ;
+set c ( car b ) + cdr a ;
+c ;
+set c cdr a + ( 4 6 ) ;
+c ;
+(1 cdr b 3) ;
