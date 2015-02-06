@@ -29,7 +29,7 @@ g[nt.IADDEXPRA] = [[t.PLUS, nt.LISTEXPR, nt.IADDEXPRA], [nt.ITEMEND]]
 
 g[nt.LISTEXPR] = [[nt.VAR],[t.LPAREN, nt.ITEMS], [t.CDR, nt.LISTEXPR]]
 g[nt.VAR] = [[t.CHAR]]
-g[nt.ITEMS] = [[nt.ITEM, nt.ITEMEND]]
+g[nt.ITEMS] = [[nt.ITEM, nt.ITEMEND], [nt.IADDEXPR, nt.ITEMEND]]
 g[nt.ITEMEND] = [[nt.ITEM, nt.ITEMEND], [nt.IADDEXPR], [t.RPAREN]]
 g[nt.ITEM] = [[t.CAR, nt.LISTEXPR], [t.STR], [t.INT], [t.REAL]]
 

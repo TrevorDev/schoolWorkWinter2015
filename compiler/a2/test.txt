@@ -1,1 +1,1 @@
-set b ( a b ) ;
+set c cdr a + cdr b + ( ) ;

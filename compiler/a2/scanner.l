@@ -5,7 +5,7 @@
 DIGIT    [0-9]
 HEX      [0-9a-fA-F]
 OCT      [0-7]
-CHAR     [^ \t\n]
+CHAR     [A-Za-z]
 %%
 [ \t\n]+																																				/* ignore this token */
 set          																																		return TOKEN_SET;

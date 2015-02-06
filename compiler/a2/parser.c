@@ -26,16 +26,14 @@ int main(int argc, char **argv)
 	stmts();
 	// int x = yylex();
 	// while(x != TOKEN_FILE_END){
-	// 	print("%d", x);
-	// 	if(x == TOKEN_PLUS){
-	// 		print("plus hit");
-	// 	}
+	// 	printToken(x);
 	// 	x = yylex();
 	// }
 
 }
 
 void stmts(){
+	printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_SET:
 		case TOKEN_CHAR:
@@ -45,13 +43,14 @@ void stmts(){
 			stmtend();
 			break;
 		default:
+			printf("ERROR: %s\n", __func__);
 			printToken(curTok);
-			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
 
 void stmtend(){
+	printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_SET:
 		case TOKEN_CHAR:
@@ -61,13 +60,14 @@ void stmtend(){
 			stmtend();
 			break;
 		default:
+			printf("ERROR: %s\n", __func__);
 			printToken(curTok);
-			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
 
 void stmt(){
+	printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_SET:
 			assign();
@@ -78,13 +78,14 @@ void stmt(){
 			addexpr();
 			break;
 		default:
+			printf("ERROR: %s\n", __func__);
 			printToken(curTok);
-			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
 
 void assign(){
+	printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_SET:
 			consume(TOKEN_SET);
@@ -92,13 +93,14 @@ void assign(){
 			addexpr();
 			break;
 		default:
+			printf("ERROR: %s\n", __func__);
 			printToken(curTok);
-			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
 
 void addexpr(){
+	printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_CHAR:
 		case TOKEN_CDR:
@@ -107,13 +109,14 @@ void addexpr(){
 			addexpra();
 			break;
 		default:
+			printf("ERROR: %s\n", __func__);
 			printToken(curTok);
-			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
 
 void addexpra(){
+	printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_SEMICOLIN:
 			consume(TOKEN_SEMICOLIN);
@@ -124,13 +127,14 @@ void addexpra(){
 			addexpra();
 			break;
 		default:
+			printf("ERROR: %s\n", __func__);
 			printToken(curTok);
-			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
 
 void iaddexpr(){
+	printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_CHAR:
 		case TOKEN_CDR:
@@ -139,13 +143,14 @@ void iaddexpr(){
 			iaddexpra();
 			break;
 		default:
+			printf("ERROR: %s\n", __func__);
 			printToken(curTok);
-			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
 
 void iaddexpra(){
+	printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_CHAR:
 		case TOKEN_STR:
@@ -163,25 +168,27 @@ void iaddexpra(){
 			iaddexpra();
 			break;
 		default:
+			printf("ERROR: %s\n", __func__);
 			printToken(curTok);
-			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
 
 void var(){
+	printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_CHAR:
 			consume(TOKEN_CHAR);
 			break;
 		default:
+			printf("ERROR: %s\n", __func__);
 			printToken(curTok);
-			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
 
 void listexpr(){
+	printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_CHAR:
 			var();
@@ -195,14 +202,20 @@ void listexpr(){
 			items();
 			break;
 		default:
+			printf("ERROR: %s\n", __func__);
 			printToken(curTok);
-			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
 
 void items(){
+	printf("ENTERING %s\n", __func__);
 	switch(curTok){
+		case TOKEN_LPAREN:
+		case TOKEN_CDR:
+		case TOKEN_CHAR:
+			iaddexpr();
+			break;
 		case TOKEN_STR:
 		case TOKEN_INT:
 		case TOKEN_REAL:
@@ -211,13 +224,14 @@ void items(){
 			itemend();
 			break;
 		default:
+			printf("ERROR: %s\n", __func__);
 			printToken(curTok);
-			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
 
 void itemend(){
+	printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_CDR:
 		case TOKEN_CHAR:
@@ -232,16 +246,17 @@ void itemend(){
 			itemend();
 			break;
 		case TOKEN_RPAREN:
-		consume(TOKEN_RPAREN);
-		break;
+			consume(TOKEN_RPAREN);
+			break;
 		default:
+			printf("ERROR: %s\n", __func__);
 			printToken(curTok);
-			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
 
 void item(){
+	printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_STR:
 			consume(TOKEN_STR);
@@ -257,8 +272,8 @@ void item(){
 			listexpr();
 			break;
 		default:
+			printf("ERROR: %s\n", __func__);
 			printToken(curTok);
-			printf("%s\n", __func__);
 			error("PARSE ERROR");
 	}
 }
@@ -272,13 +287,13 @@ void consume(int x){
 		}
 	}else{
 		printToken(curTok);
-		printf("%s\n", __func__);
+		printf("ERROR: %s\n", __func__);
 		error("PARSE ERROR");
 	}
 }
 
 void printToken(int t){
-	switch(curTok){
+	switch(t){
 		case TOKEN_SET:
 	    print("TOKEN_SET");
 	    break;
