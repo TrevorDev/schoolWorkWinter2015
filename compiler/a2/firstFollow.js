@@ -122,9 +122,10 @@ var filterEmpty = function(ar){
 
 var pt = [];
 for(var nonTerm in nt){
+	pt[nonTerm] = []
 	for(var term in t){
 		if(term != t.EMPTY){
-			pt[nonTerm + " " + term] = [];
+			pt[nonTerm][term] = [];
 		}
 	}
 }
@@ -137,7 +138,7 @@ var addToPt = function(sym){
 					for(var j = 0;j<g[key].length;j++){
 						for(var k = 0;k<g[key][j].length;k++){
 							if(g[key][j][k] == sym){
-								pt[key + " " + first[i]].push(g[key][j])
+								pt[key][first[i]].push(g[key][j])
 							}
 							//ONLYS TARTING WITH SYM
 							if(firstOf(g[key][j][k]).indexOf(t.EMPTY) == -1){
@@ -157,7 +158,7 @@ var addToPt = function(sym){
 									// if(key + " " + follow[m]=="ITEM CHAR"){
 									// 	console.log(sym, "BAD", g[key][j])
 									// }
-									pt[key + " " + follow[m]].push(g[key][j])
+									pt[key][follow[m]].push(g[key][j])
 								}
 							}
 							//ONLY ENDING WITH SYM which is why k-- above
@@ -181,13 +182,32 @@ for(var nonTerm in t){
 	//}
 }
 var count = 0;
-for(var key in pt){
-	var ar = makeUniq(pt[key]);
+// for(var key in pt){
+// 	var ar = makeUniq(pt[key]);
 	
-	if(ar.length > 0){
-		console.log(key)
-		console.log(ar)
-		count++;
+// 	if(ar.length > 0){
+// 		console.log(key)
+// 		console.log(ar)
+// 		count++;
+// 	}
+// }
+
+
+for(var nonTerm in t){
+	if(term != t.EMPTY){
+		process.stdout.write("+"+nonTerm);
 	}
 }
-console.log(count)
+console.log();
+for(var nonTerm in nt){
+	process.stdout.write(nonTerm);
+	for(var term in t){
+		if(term != t.EMPTY){
+			process.stdout.write("+"+pt[nonTerm][term]);
+		}
+	}
+	console.log();
+}
+
+
+//console.log(count)
