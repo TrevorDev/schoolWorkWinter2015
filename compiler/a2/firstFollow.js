@@ -117,9 +117,7 @@ var filterEmpty = function(ar){
 }
 
 // for(var key in g){
-// 	console.log(key);
-// 	console.log(firstOf(key))
-// 	console.log(followOf(key))
+// 	console.log(key + ">"+ firstOf(key) +">"+followOf(key));
 // }
 
 var pt = [];
@@ -186,7 +184,7 @@ var count = 0;
 for(var key in pt){
 	var ar = makeUniq(pt[key]);
 	
-	if(ar.length > 1){
+	if(ar.length > 0){
 		console.log(key)
 		console.log(ar)
 		count++;
