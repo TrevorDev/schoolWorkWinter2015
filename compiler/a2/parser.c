@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 {
 	curTok = yylex();
 	stmts();
-	print("Matches grammer!");
+	print("Input matches grammer!");
 	// int x = yylex();
 	// while(x != TOKEN_FILE_END){
 	// 	printToken(x);
@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 }
 
 void stmts(){
-	printf("ENTERING %s\n", __func__);
+	//printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_SET:
 		case TOKEN_CHAR:
@@ -45,14 +45,15 @@ void stmts(){
 			stmtend();
 			break;
 		default:
-			printf("ERROR: %s LINE %d\n", __func__);
+			printf("Unexpected token ");
 			printToken(curTok);
-			error("PARSE ERROR");
+			printf(" in production %s on line %d\n", __func__, yylineno);
+			exit(0);
 	}
 }
 
 void stmtend(){
-	printf("ENTERING %s\n", __func__);
+	//printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_SET:
 		case TOKEN_CHAR:
@@ -62,14 +63,15 @@ void stmtend(){
 			stmtendend();
 			break;
 		default:
-			printf("ERROR: %s\n", __func__);
+			printf("Unexpected token ");
 			printToken(curTok);
-			error("PARSE ERROR");
+			printf(" in production %s on line %d\n", __func__, yylineno);
+			exit(0);
 	}
 }
 
 void stmtendend(){
-	printf("ENTERING %s\n", __func__);
+	//printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_FILE_END:
 			break;
@@ -80,14 +82,15 @@ void stmtendend(){
 			stmtend();
 			break;
 		default:
-			printf("ERROR: %s\n", __func__);
+			printf("Unexpected token ");
 			printToken(curTok);
-			error("PARSE ERROR");
+			printf(" in production %s on line %d\n", __func__, yylineno);
+			exit(0);
 	}
 }
 
 void stmt(){
-	printf("ENTERING %s\n", __func__);
+	//printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_SET:
 			assign();
@@ -98,14 +101,15 @@ void stmt(){
 			addexpr();
 			break;
 		default:
-			printf("ERROR: %s\n", __func__);
+			printf("Unexpected token ");
 			printToken(curTok);
-			error("PARSE ERROR");
+			printf(" in production %s on line %d\n", __func__, yylineno);
+			exit(0);
 	}
 }
 
 void assign(){
-	printf("ENTERING %s\n", __func__);
+	//printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_SET:
 			consume(TOKEN_SET);
@@ -113,14 +117,15 @@ void assign(){
 			addexpr();
 			break;
 		default:
-			printf("ERROR: %s\n", __func__);
+			printf("Unexpected token ");
 			printToken(curTok);
-			error("PARSE ERROR");
+			printf(" in production %s on line %d\n", __func__, yylineno);
+			exit(0);
 	}
 }
 
 void addexpr(){
-	printf("ENTERING %s\n", __func__);
+	//printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_CHAR:
 		case TOKEN_CDR:
@@ -129,14 +134,15 @@ void addexpr(){
 			addexpra();
 			break;
 		default:
-			printf("ERROR: %s\n", __func__);
+			printf("Unexpected token ");
 			printToken(curTok);
-			error("PARSE ERROR");
+			printf(" in production %s on line %d\n", __func__, yylineno);
+			exit(0);
 	}
 }
 
 void addexpra(){
-	printf("ENTERING %s\n", __func__);
+	//printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_SEMICOLIN:
 			consume(TOKEN_SEMICOLIN);
@@ -147,14 +153,15 @@ void addexpra(){
 			addexpra();
 			break;
 		default:
-			printf("ERROR: %s\n", __func__);
+			printf("Unexpected token ");
 			printToken(curTok);
-			error("PARSE ERROR");
+			printf(" in production %s on line %d\n", __func__, yylineno);
+			exit(0);
 	}
 }
 
 void iaddexpr(){
-	printf("ENTERING %s\n", __func__);
+	//printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_CHAR:
 		case TOKEN_CDR:
@@ -163,14 +170,15 @@ void iaddexpr(){
 			iaddexpra();
 			break;
 		default:
-			printf("ERROR: %s\n", __func__);
+			printf("Unexpected token ");
 			printToken(curTok);
-			error("PARSE ERROR");
+			printf(" in production %s on line %d\n", __func__, yylineno);
+			exit(0);
 	}
 }
 
 void iaddexpra(){
-	printf("ENTERING %s\n", __func__);
+	//printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_CHAR:
 		case TOKEN_STR:
@@ -188,27 +196,29 @@ void iaddexpra(){
 			iaddexpra();
 			break;
 		default:
-			printf("ERROR: %s\n", __func__);
+			printf("Unexpected token ");
 			printToken(curTok);
-			error("PARSE ERROR");
+			printf(" in production %s on line %d\n", __func__, yylineno);
+			exit(0);
 	}
 }
 
 void var(){
-	printf("ENTERING %s\n", __func__);
+	//printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_CHAR:
 			consume(TOKEN_CHAR);
 			break;
 		default:
-			printf("ERROR: %s\n", __func__);
+			printf("Unexpected token ");
 			printToken(curTok);
-			error("PARSE ERROR");
+			printf(" in production %s on line %d\n", __func__, yylineno);
+			exit(0);
 	}
 }
 
 void listexpr(){
-	printf("ENTERING %s\n", __func__);
+	//printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_CHAR:
 			var();
@@ -222,14 +232,15 @@ void listexpr(){
 			items();
 			break;
 		default:
-			printf("ERROR: %s\n", __func__);
+			printf("Unexpected token ");
 			printToken(curTok);
-			error("PARSE ERROR");
+			printf(" in production %s on line %d\n", __func__, yylineno);
+			exit(0);
 	}
 }
 
 void items(){
-	printf("ENTERING %s\n", __func__);
+	//printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_RPAREN:
 			consume(TOKEN_RPAREN);
@@ -247,14 +258,15 @@ void items(){
 			itemend();
 			break;
 		default:
-			printf("ERROR: %s\n", __func__);
+			printf("Unexpected token ");
 			printToken(curTok);
-			error("PARSE ERROR");
+			printf(" in production %s on line %d\n", __func__, yylineno);
+			exit(0);
 	}
 }
 
 void itemend(){
-	printf("ENTERING %s\n", __func__);
+	//printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_CDR:
 		case TOKEN_CHAR:
@@ -272,14 +284,15 @@ void itemend(){
 			consume(TOKEN_RPAREN);
 			break;
 		default:
-			printf("ERROR: %s\n", __func__);
+			printf("Unexpected token ");
 			printToken(curTok);
-			error("PARSE ERROR");
+			printf(" in production %s on line %d\n", __func__, yylineno);
+			exit(0);
 	}
 }
 
 void item(){
-	printf("ENTERING %s\n", __func__);
+	//printf("ENTERING %s\n", __func__);
 	switch(curTok){
 		case TOKEN_STR:
 			consume(TOKEN_STR);
@@ -295,63 +308,67 @@ void item(){
 			listexpr();
 			break;
 		default:
-			printf("ERROR: %s\n", __func__);
+			printf("Unexpected token ");
 			printToken(curTok);
-			error("PARSE ERROR");
+			printf(" in production %s on line %d\n", __func__, yylineno);
+			exit(0);
 	}
 }
 
 void consume(int x){
-	printToken(x);
+	//printToken(x);
 	if(curTok == x){
 		curTok = yylex();
 		// if(curTok == TOKEN_FILE_END){
 		// 	error("DONE");
 		// }
 	}else{
+		printf("Expected ");
+		printToken(x);
+		printf("but found ");
 		printToken(curTok);
-		printf("ERROR: %s\n", __func__);
-		error("PARSE ERROR");
+		printf(" on line %d\n", yylineno);
+		error(0);
 	}
 }
 
 void printToken(int t){
 	switch(t){
 		case TOKEN_SET:
-	    print("TOKEN_SET");
+	    printf("TOKEN_SET");
 	    break;
 		case TOKEN_CHAR:
-	    print("TOKEN_CHAR");
+	    printf("TOKEN_CHAR");
 	    break;
 		case TOKEN_INT:
-	    print("TOKEN_INT");
+	    printf("TOKEN_INT");
 	    break;
 		case TOKEN_REAL:
-	    print("TOKEN_REAL");
+	    printf("TOKEN_REAL");
 	    break;
 		case TOKEN_STR:
-	    print("TOKEN_STR");
+	    printf("TOKEN_STR");
 	    break;
 		case TOKEN_CAR:
-	    print("TOKEN_CAR");
+	    printf("TOKEN_CAR");
 	    break;
 		case TOKEN_CDR:
-	    print("TOKEN_CDR");
+	    printf("TOKEN_CDR");
 	    break;
 		case TOKEN_LPAREN:
-	    print("TOKEN_LPAREN");
+	    printf("TOKEN_LPAREN");
 	    break;
 		case TOKEN_RPAREN:
-	    print("TOKEN_RPAREN");
+	    printf("TOKEN_RPAREN");
 	    break;
 		case TOKEN_PLUS:
-	    print("TOKEN_PLUS");
+	    printf("TOKEN_PLUS");
 	    break;
 		case TOKEN_SEMICOLIN:
-	    print("TOKEN_SEMICOLIN");
+	    printf("TOKEN_SEMICOLIN");
 	    break;
 		case TOKEN_FILE_END:
-	    print("TOKEN_FILE_END");
+	    printf("TOKEN_FILE_END");
 	    break;
 		default:
 			error("unknownToken");
