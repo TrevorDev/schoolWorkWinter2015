@@ -1,4 +1,5 @@
-//clear; flex scanner.l; gcc lex.yy.c -o scanner -lfl;
+//Author: Trevor Baron
+//This is a recognizer that matches the given grammer
 #include "dlxlib.h"
 #include "scanner.h"
 #include "tokens.h"

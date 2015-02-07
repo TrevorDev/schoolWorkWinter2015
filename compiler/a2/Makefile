@@ -1,7 +1,7 @@
 CC          =	gcc
 # Flags that are sent to the compiler
 # Do not change these
-CFLAGS      = -g -pedantic -Wall -std=c99 -D_POSIX_C_SOURCE=199309L
+CFLAGS      = -g -pedantic -std=c99 -D_POSIX_C_SOURCE=199309L
 LDFLAGS     =
 
 #Directories where the compiler can find things
@@ -15,7 +15,7 @@ SRCDIR = ./
 #Put the names of your source code files in the lines below.  You will need both your
 # Solution source code file and the source code with the main program in it
 
-SOURCE = $(SRCDIR)parser.c $(SRCDIR)dlxlib.c $(SRCDIR)scanner.c
+SOURCE = $(SRCDIR)parselist.c $(SRCDIR)dlxlib.c $(SRCDIR)scanner.c
 
 
 #The list of object files for each program is below.  
@@ -23,10 +23,10 @@ SOURCE = $(SRCDIR)parser.c $(SRCDIR)dlxlib.c $(SRCDIR)scanner.c
 # except with .o instead of .c.   Make changes as appropriate
 
 
-OBJS    = parser.o dlxlib.o scanner.o
+OBJS    = parselist.o dlxlib.o scanner.o
 
 
-PROGNAME = $(BINDIR)parser
+PROGNAME = $(BINDIR)parselist
 
 default : all
 
@@ -43,7 +43,7 @@ clean:
 scanner:
 	flex --header-file=scanner.h --outfile=scanner.c scanner.l;
 
-parser: prog 
+parselist: all 
 
 run: prog 
 	$(PROGNAME)
