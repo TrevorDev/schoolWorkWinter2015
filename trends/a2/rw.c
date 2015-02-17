@@ -18,7 +18,7 @@ void sendReceiveMsg(int sockfd, char*msg){
     if (n < 0){
         error("ERROR reading from socket");
     }
-    printf("%s\n",buffer);
+    //printf("%s\n",buffer);
 }
 
 void randSleep(){

@@ -61,10 +61,6 @@ int sendAck(int cliSock){
 void* runServer(void *arg)
 {
     int stopfd = *((int*)arg);
-    //pthread_t tid[MAX_CONN];
-    //int connSocket[MAX_CONN];
-
-    //int threadCount = 0;
     int sockfd = createTcpServerSocket(3000);
     if(sockfd == -1){
         error("bad server socket");
@@ -76,7 +72,6 @@ void* runServer(void *arg)
     linkedMT * groups = createLinkedMT();
     print("server started");
     while(1){
-        //weird it breaks if this stuff is outside the while????
         fd_set read_fd_set;
         FD_ZERO (&read_fd_set);
         FD_SET (sockfd, &read_fd_set);
@@ -96,17 +91,15 @@ void* runServer(void *arg)
             }
         }
         
-
-        //print("selecting");
         if(select(maxfd+1, &read_fd_set, NULL, NULL, NULL) == -1){
             error("bad select");
         }
+
         if(dataAvailible(stopfd)){
+            //SHUTDOWN AND FREE MEMORY
             char buf[5];
             read(stopfd, buf, 5);
-            //print("%s", buf);
             close(sockfd);
-            //TODO FREE CLIENT ELEMENTS
             free(clients);
 
             {
@@ -140,6 +133,7 @@ void* runServer(void *arg)
         }
 
         if(dataAvailible(sockfd)){
+            //accept new connection client
             int newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
             if (newsockfd < 0){
                 error("ERROR on accept");
@@ -147,6 +141,7 @@ void* runServer(void *arg)
             int * data = malloc(sizeof(int));
             (*data) = newsockfd;
             char* key = intToStr(newsockfd);
+            //push to list of clients
             pushLinkedMT(clients, data, key);
             free(key);
             continue;
@@ -155,6 +150,7 @@ void* runServer(void *arg)
         {
             linkedNode * it = clients->head;
             while(it!=NULL){
+                //check if any existing clients have sent a msg
                 int cliSock = *((int*)(it->data));
                 if(dataAvailible(cliSock)){
                     char buffer[256];
@@ -171,7 +167,7 @@ void* runServer(void *arg)
                         close(cliSock);
                         break;
                     }
-                    print("Here is the message: %s",buffer);
+                    //print("Here is the message: %s",buffer);
                     vector * v = split(buffer, " ");
                     char ** args = (char **)(v->ar);
                     int * tmp = strToInt(args[0]);
@@ -233,16 +229,6 @@ void* runServer(void *arg)
             }
 
         }
-
-        // //spawn thread
-        // connSocket[threadCount] = newsockfd;
-        // int err = pthread_create(&(tid[threadCount]), NULL, &connectionHandler, &connSocket[threadCount]);
-        // threadCount++;
-        // if (err != 0){
-        //      error("can't create thread");
-        // }
-        // //NEED TO JOIN
-        // pthread_join(tid[threadCount-1], NULL);
     }
     
     return NULL;
