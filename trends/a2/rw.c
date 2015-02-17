@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
                 fprintf(fptr, "%s", id);
             }fclose(fptr);
         }else{
+            fopen(filename, "a+");
             char * str = fileToString(filename);
             print("%s", str);
         }
