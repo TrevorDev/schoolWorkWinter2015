@@ -1,5 +1,5 @@
 #include "dlxlib.h"
-#define MAX_IN_GROUP 5
+#define MAX_IN_GROUP 300
 //clear; valgrind ./rw 1 W cool.txt 192.168.1.107
 //clear; valgrind --leak-check=full ./server
 
