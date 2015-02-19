@@ -1,5 +1,5 @@
 #include "dlxlib.h"
-
+#define MAX_IN_GROUP 5
 //clear; valgrind ./rw 1 W cool.txt 192.168.1.107
 //clear; valgrind --leak-check=full ./server
 
@@ -51,13 +51,33 @@ int main(int argc, char *argv[])
         randSleep();
         sendReceiveMsg(sockfd, msgReq);
         if(type[0] == 'W'){
-            FILE *fptr = fopen(filename, "a+");{
-                fprintf(fptr, "%s", id);
+            FILE *fptr = fopen(filename, "a+");{}fclose(fptr);
+            int * x = calloc(sizeof(int), MAX_IN_GROUP);
+            fptr = fopen(filename, "r+");{
+                fseek(fptr,0,SEEK_SET);
+                fread(x, sizeof(int), MAX_IN_GROUP, fptr);
+                int idVal = (int)strtol(id, NULL, 0);
+                x[idVal]++;
+                for(int i = 0;i<MAX_IN_GROUP;i++){
+                    //printf("%d ", x[i]);
+                }
+                //printf("\n");
             }fclose(fptr);
+            fptr = fopen(filename, "w+");{
+                fwrite(x, sizeof(int), MAX_IN_GROUP, fptr);
+            }fclose(fptr);
+            free(x);
         }else{
-            fopen(filename, "a+");
-            char * str = fileToString(filename);
-            print("%s", str);
+           FILE *fptr = fopen(filename, "a+");{}fclose(fptr);
+           int * x = calloc(sizeof(int), MAX_IN_GROUP);
+           fptr = fopen(filename, "r+");{
+                fseek(fptr,0,SEEK_SET);
+                fread(x, sizeof(int), MAX_IN_GROUP, fptr);
+                for(int i = 0;i<MAX_IN_GROUP;i++){
+                    printf("%d ", x[i]);
+                }
+                printf("\n");
+            }fclose(fptr);
         }
         sendReceiveMsg(sockfd, msgRel);
     }
