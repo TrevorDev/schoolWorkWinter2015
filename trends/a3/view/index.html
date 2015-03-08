@@ -1,0 +1,94 @@
+{% extends 'layout.html' %}
+{% block body %}
+
+<div class="container-wide" ng-controller="homeCtrl">
+<div ng-show="curUserName == null">
+  <form class="form-inline ng-pristine ng-valid" style="padding-top: 12px;" role="form" ng-submit="login()" scroll-bottom="chat-window">
+  <input maxlength="256" autocomplete="off" autofocus="" id="messageText" ng-model="messageText" class="form-control ng-pristine ng-valid" style="width: 100%;" placeholder="Enter your name">
+  </form>
+</div>
+<div ng-show="curUserName != null">
+<div class="chat-window-wrapper">
+    <div class="chat-window" id="chat-window">
+      <div>
+      </div>
+    </div>
+    <div id="push">
+    </div>
+    <div style="width: 140px;right: 0px;position: absolute;overflow: auto;top:65px;">
+      <ul class="list-group">
+        <li class="list-group-item">Users</li>
+        <li ng-repeat="(user, value) in curRoom.users" class="list-group-item">[[user]]</li>
+      </ul>
+    </div>
+</div>
+
+
+<div id="footer" class="noscript-hide" style="position:fixed;bottom:0px;width:100%;">
+    <form class="form-inline ng-pristine ng-valid" style="padding-top: 12px;" role="form" ng-submit="addMessage()" scroll-bottom="chat-window">
+      <input maxlength="256" autocomplete="off" autofocus="" name="messageText" ng-model="messageText" class="form-control ng-pristine ng-valid" style="width: 100%;" placeholder="Type here and press enter to send a message">
+    </form>
+</div>
+</div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+var Msg = function(user, text){
+  this.user = user
+  this.text = text
+}
+var Room = function(name, users){
+  this.msgs = []
+  this.users = {}
+  for(var i = 0;i<users.length;i++){
+    this.users[users[i]] = {}
+  }
+  this.name = name
+
+  this.addUser = function(user){
+    this.users[user] = {}
+  }
+  this.removeUser = function(user){
+    delete this.users[user]
+  }
+}
+
+function homeCtrl($scope, $http) {
+  var socket = io();
+  $scope.curUserName = null
+  $scope.rooms  = {}
+  $scope.curRoom = null;
+  $scope.login = function(){
+    //$("#messageText").val("logging in")
+    socket.emit("login", {name: $("#messageText").val()})
+    //$scope.curUserName = $("#messageText").val()
+  }
+
+  socket.on("", function(data){
+
+  })
+
+  socket.on("userJoinedRoom", function(data){
+    console.log(data)
+    $scope.rooms[data.roomName].addUser(data.userName)
+    $scope.$apply();
+  })
+
+  socket.on("login", function(data){
+    console.log(data);
+    if(data.name){
+      $scope.curUserName = data.name
+      $scope.curRoom = new Room(data.room.name, data.room.users)
+      $scope.rooms[data.room.name] = $scope.curRoom
+      console.log($scope.curRoom)
+      $scope.$apply();
+    }else{
+      alert("name already exist")
+    }
+  })
+}
+</script>
+{% endblock %}
