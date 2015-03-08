@@ -8,17 +8,18 @@
   </form>
 </div>
 <div ng-show="curUserName != null">
-<div class="chat-window-wrapper">
-    <div class="chat-window" id="chat-window">
-      <div>
-      </div>
+<div class="chat-window-wrapper" style="min-height: 100%;height: auto !important;height: 100%;margin: 0px auto -60px;">
+    <div class="chat-window" id="chat-window" style="background-color: #FFF;right: 140px;left: 0px;position: absolute;top: 51px;bottom: 60px;overflow: auto;">
+      <div ng-repeat="msg in curRoom.msgs" class="list-group-item">[[msg.user]]:[[msg.text]]</div>
     </div>
     <div id="push">
     </div>
     <div style="width: 140px;right: 0px;position: absolute;overflow: auto;top:65px;">
       <ul class="list-group">
-        <li class="list-group-item">Users</li>
-        <li ng-repeat="(user, value) in curRoom.users" class="list-group-item">[[user]]</li>
+        <li class="list-group-item" style="font-size: 1.5em">Rooms</li>
+        <li ng-repeat="(room, value) in rooms" class="list-group-item" ng-click="setCurRoom([[room]])">[[room]]</li>
+        <li class="list-group-item" style="font-size: 1.5em">Users</li>
+        <li ng-repeat="(user, value) in curRoom.users" class="list-group-item" ng-click="createPM([[user]])">[[user]]</li>
       </ul>
     </div>
 </div>
@@ -26,7 +27,7 @@
 
 <div id="footer" class="noscript-hide" style="position:fixed;bottom:0px;width:100%;">
     <form class="form-inline ng-pristine ng-valid" style="padding-top: 12px;" role="form" ng-submit="addMessage()" scroll-bottom="chat-window">
-      <input maxlength="256" autocomplete="off" autofocus="" name="messageText" ng-model="messageText" class="form-control ng-pristine ng-valid" style="width: 100%;" placeholder="Type here and press enter to send a message">
+      <input maxlength="256" autocomplete="off" autofocus="" class="form-control ng-pristine ng-valid" id="sendMsg" style="width: 100%;" placeholder="Type here and press enter to send a message">
     </form>
 </div>
 </div>
@@ -67,13 +68,56 @@ function homeCtrl($scope, $http) {
     //$scope.curUserName = $("#messageText").val()
   }
 
+  $scope.createPM = function(userName){
+    var r = window.confirm("Create a personal message room with "+userName+"?");
+    if(r){
+      socket.emit("createPMRoom", {userName: userName})
+    }
+  }
+
+  $scope.addMessage = function(){
+    if($("#sendMsg").val() == ""){
+      return
+    }
+    socket.emit("sendMsg", {roomName: $scope.curRoom.name, msg: $("#sendMsg").val()})
+    $("#sendMsg").val("")
+  }
+
+  $scope.setCurRoom =  function(room){
+    //alert(room)
+    $scope.curRoom = $scope.rooms[room]
+    //$scope.$apply()
+  }
+
   socket.on("", function(data){
 
+  })
+
+  socket.on("sendMsg", function(data){
+    console.log(data);
+    var m = new Msg(data.userName, data.msg)
+    if(!$scope.rooms[data.roomName]){
+      $scope.rooms[data.roomName] = new Room(data.roomName, [])
+    }
+    $scope.rooms[data.roomName].msgs.push(m)
+    console.log($scope.rooms)
+    $scope.$apply();
+  })
+
+  socket.on("roomJoined", function(data){
+    $scope.rooms[data.room.name] = new Room(data.room.name, data.room.users)
+    $scope.$apply()
   })
 
   socket.on("userJoinedRoom", function(data){
     console.log(data)
     $scope.rooms[data.roomName].addUser(data.userName)
+    $scope.$apply();
+  })
+
+  socket.on("userLeftRoom", function(data){
+    console.log(data)
+    $scope.rooms[data.roomName].removeUser(data.userName)
     $scope.$apply();
   })
 
@@ -86,7 +130,7 @@ function homeCtrl($scope, $http) {
       console.log($scope.curRoom)
       $scope.$apply();
     }else{
-      alert("name already exist")
+      alert(data.error)
     }
   })
 }

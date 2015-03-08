@@ -105,7 +105,7 @@ io.on('connection', function(socket) {
             if(users[data.name]){
                 socket.emit("login",{error: "bad name"})
             }else{
-                users[data.name] = {}
+                users[data.name] = socket
                 socket.data.name = data.name
 
                 socket.join(defRoomName);
@@ -118,8 +118,30 @@ io.on('connection', function(socket) {
             socket.emit("login",{error: "bad req"})
         }
     })
+    socket.on("createPMRoom", function(data){
+        var roomName = "PM_"+data.userName+"-"+socket.data.name;
+        socket.join(roomName)
+        if(users[data.userName]){
+            users[data.userName].join(roomName)
+        }
+        io.sockets.to(roomName).emit("roomJoined", { room: {name: roomName, users: [data.userName, socket.data.name]} })
+    })
 
+    socket.on("sendMsg", function(data){
+        console.log(data);
+        //socket.broadcast.
+        io.sockets.to(data.roomName).emit("sendMsg", { roomName: data.roomName, userName: socket.data.name, msg: data.msg })
+    })
 
+    socket.onclose = function(reason){ 
+        //HACK to emit left room before socketio deletes all rooms before disconnect msg is received
+        //emit to rooms here
+        //acceess socket.adapter.sids[socket.id] to get all rooms for the socket
+        for(var key in socket.adapter.sids[socket.id]){
+            socket.broadcast.to(key).emit('userLeftRoom', { roomName: key, userName: socket.data.name });
+        }
+        Object.getPrototypeOf(this).onclose.call(this,reason);
+    }
     socket.on('disconnect', function() {
         console.log('user disconnected');
         delete users[socket.data.name]
