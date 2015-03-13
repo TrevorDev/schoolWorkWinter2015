@@ -1,6 +1,8 @@
 #include "dlxlib.h"
 #define ASCII_CHARS 128
 
+int compSize = 0;
+
 typedef struct charCount {
    char c;
    int count;
@@ -146,6 +148,8 @@ void printBtLeafs(binaryTree * bt, int bitLeng, int bits){
             }
             bits >>= 1;
         }
+        //printf(" %d %d", bitLeng, ((charCount *)(bt->data))->count);
+        compSize += bitLeng * ((charCount *)(bt->data))->count;
         printf("\n");
     }else{
         if(bt->left != NULL){
@@ -166,10 +170,12 @@ int main(int argc, char **argv)
     }
 
     int heapSizeNeeded = 0;
+    int totalChars = 0;
     for(int c = getchar();;c = getchar()){
         if(c==EOF){
             break;
         }
+        totalChars++;
         if(countAr[c] == 0){
             heapSizeNeeded++;
         }
@@ -213,6 +219,9 @@ int main(int argc, char **argv)
     //print("\n");
     //printBt(heapAr[0]);
     printBtLeafs(heapAr[0], 0, 0);
+    printf("Old Size: %d\n", totalChars*8);
+    printf("Compressed Size: %d\n", compSize);
+    printf("Compression Ratio: %lf%%\n", ((float)compSize*100)/(float)(totalChars*8));
     //print("%d %d", countAr['e'], heapSizeNeeded);
     for(int i = 0;i<heap->size;i++){
         freeBt(heapAr[i]);

@@ -1,0 +1,56 @@
+Check if hackers have your user names, passwords and email address
+
+From: https://www.komando.com/tips/263947/check-if-hackers-have-your-user-names-and-passwords
+
+It hasn't been a good year for company security. I've told you about the major data breaches at Target, 
+Yahoo!, Adobe, Michael's, Neiman Marcus, eBay, Goodwill and plenty of others. That's just the tip of the 
+iceberg.
+
+If you add in smaller data breaches, there were more than 2,000 breaches in the last year, and hackers 
+got their hands on more than 800 million user records! Hackers released a lot of this information online, 
+just for fun.
+
+Fortunately, some helpful programmers put together ways to see if hackers have released your information.
+
+The story isn't as one-sided as it might seem, though, because it isn't just legitimate retailers and 
+online sites that get hacked. Hackers can use bad passwords and have poor security, too.
+
+Plenty of hackers attack other hacker sites, steal information and then release it online.
+
+That's where a new site called Indexeus comes in. It claims to have 200 million records from data 
+breaches at more than 100 sites. The thing is that while there is some information from big retailer data 
+breaches in there, most of the information is from hacker sites.
+
+That means you can go in and search for usernames, email addresses, passwords and other details on 
+hackers. Once you have that information, you can often find out who they are in real life - also known as 
+"doxing."
+
+Security researcher Brian Krebs doxed the owner of Indexeus - nicknamed "Dubitus" - and found out his 
+real name is Jason Relinquo, he's 23 and his lives in Lisbon, Portugal.
+
+Ironically, Relinquo teaches a $25 course in how to dox and how to stop people from doxing you. I guess 
+he needs to take his own class.
+
+When Indexeus was first released, it made waves because it told hackers they could make a $1 payment to 
+the site to have their information taken out, which lots of hackers complained was blackmail.
+
+Now - according to Relinquo - anyone can remove their information for free if they ask. You do still have 
+to pay to download any data from the site, though. Of course, the site might not last that long. Since I 
+started writing this, it has been up and down quite a bit and it wouldn't let me register.
+
+I'd say some of the hackers decided to go on the offensive and take it down themselves. I guess they 
+didn't believe Indexeus' disclaimer:
+
+The purpose of Indexeus is not to provide private information about someone, but to protect them by 
+creating awareness. Therefore we are not responsible for any misuse or malicious use of our content and 
+service.
+
+ So, what do you think? Is Indexeus poetic justice for hackers? Is it just another way hackers are 
+exploiting information that isn't theirs?
+
+Is it an educational tool as it says? Or is it a little bit of everything?
+
+Let me know in the comments.
+
+If you want to give Indexeus a look, keep in mind that since this site hit the news, its traffic is 
+overwhelming servers. If the site is not working, try back in a few hours.
