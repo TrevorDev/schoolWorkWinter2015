@@ -102,6 +102,7 @@ function homeCtrl($scope, $http) {
     $scope.rooms[data.roomName].msgs.push(m)
     console.log($scope.rooms)
     $scope.$apply();
+    $("#chat-window").scrollTop($("#chat-window")[0].scrollHeight);
   })
 
   socket.on("roomJoined", function(data){
