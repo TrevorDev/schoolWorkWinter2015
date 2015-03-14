@@ -218,8 +218,7 @@ int strToInt(char * str){
 	errno = 0;
 	int num = (int)strtol(str, NULL, 0);
 	if(errno!=0){
-		ret = NULL;
-		error("bad strToInt")
+		error("bad strToInt");
 	}else{ 
 		ret = num;
 	}

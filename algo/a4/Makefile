@@ -15,7 +15,7 @@ SRCDIR = ./
 #Put the names of your source code files in the lines below.  You will need both your
 # Solution source code file and the source code with the main program in it
 
-SOURCE = $(SRCDIR)huff.c $(SRCDIR)dlxlib.c
+SOURCE = $(SRCDIR)palin.c $(SRCDIR)sudoku.c $(SRCDIR)dlxlib.c
 
 
 #The list of object files for each program is below.  
@@ -26,7 +26,7 @@ SOURCE = $(SRCDIR)huff.c $(SRCDIR)dlxlib.c
 OBJS    = dlxlib.o
 
 
-PROGNAME = $(BINDIR)huff
+PROGNAME = $(BINDIR)palin
 
 default : all
 
@@ -34,15 +34,19 @@ all : prog
 
 
 prog : build
-	$(CC) $(LIBDIRS) $(LDFLAGS) -o $(PROGNAME)  $(OBJS) huff.o $(LIBS)
+	$(CC) $(LIBDIRS) $(LDFLAGS) -o $(PROGNAME)  $(OBJS) palin.o $(LIBS)
+	$(CC) $(LIBDIRS) $(LDFLAGS) -o sudoku  $(OBJS) sudoku.o $(LIBS)
 build: $(SOURCE)
 	$(CC) $(CFLAGS) -c $(SOURCE) $(INCLUDES)
 
 clean:
 	@ rm *.o
 
-run: prog 
-	$(PROGNAME)
+run_pali: prog 
+	./palin paliTest.txt
+
+run_sudoku: prog 
+	./sudoku sudoTest.txt
  
 val: prog
 	valgrind $(PROGNAME)
