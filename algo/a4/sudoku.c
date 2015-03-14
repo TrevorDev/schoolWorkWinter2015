@@ -40,7 +40,8 @@ void freeGrid(int ** g){
 }
 
 int isValid(int ** g, int x, int y){
-    int * checker = calloc(gridSize, sizeof(int));
+    int checker[gridSize];
+    memset(checker, 0, gridSize*sizeof(int));
     for(int i = 0;i<gridSize;i++){
         if(g[y][i] > 0){
             int index = g[y][i]-1;
@@ -74,7 +75,6 @@ int isValid(int ** g, int x, int y){
             }
         }
     }
-    free(checker);
     return 1;
 }
 
@@ -90,8 +90,8 @@ int ** copyGrid(int ** g){
 
 int ** solveGrid(int ** g, int x, int y){
     //print("%d %d", x, y);
-    if(g[y][x] == 0){
-        int ** gg = copyGrid(g);
+    int ** gg = copyGrid(g);
+    if(gg[y][x] == 0){
         for(int k = 1;k<10;k++){
             gg[y][x] = k;
             if(isValid(gg, x, y)){
@@ -101,25 +101,36 @@ int ** solveGrid(int ** g, int x, int y){
                 }else if(x == gridSize-1){
                     int ** r =  solveGrid(gg, 0, y+1);
                     if(r != NULL){
+                        freeGrid(gg);
                         return r;
                     }
                 }else{
                     int ** r = solveGrid(gg, x+1, y);
                     if(r != NULL){
+                        freeGrid(gg);
                         return r;
                     }
                 }
-                
             }
         }
+        freeGrid(gg);
     }else{
         if(x == gridSize-1 && y == gridSize-1){
-            return g;
+            return gg;
         }else if(x == gridSize-1){
-            return solveGrid(g, 0, y+1);
+            int ** r = solveGrid(gg, 0, y+1);
+            if(r != NULL){
+                freeGrid(gg);
+                return r;
+            }
         }else{
-            return solveGrid(g, x+1, y);
+            int ** r = solveGrid(gg, x+1, y);
+            if(r != NULL){
+                freeGrid(gg);
+                return r;
+            }
         }
+        freeGrid(gg);
     }
     // print("\n");
     // printGrid(g);
@@ -146,13 +157,14 @@ int main(int argc, char **argv)
         }
     }
 
-    g = solveGrid(g, 0, 0);
-    if(g!=NULL){
+    int ** gg = solveGrid(g, 0, 0);
+    if(gg!=NULL){
         print("\n");
-        printGrid(g);
+        printGrid(gg);
     }else{
         print("bad");
     }
-    //freeGrid(g);
+    freeGrid(g);
+    freeGrid(gg);
     return 0; 
 }
