@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+{% block body %}
+
+<div class="container-wide" ng-controller="homeCtrl">
+[[status]]
+<br>
+<div ng-repeat="card in hand" ng-show="card.show" style="display:inline">
+<img ng-click="cardHit(card)" src="/public/vendor/cards/[[card.imgName]]" alt="Mountain View" style="width:40px;">
+</div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+
+
+function homeCtrl($scope, $http) {
+  var socket = io();
+  $scope.status = "Connecting..."
+  $scope.hand = []
+  $scope.mode = "pass"
+  var cardsToPass = []
+  $scope.cardHit = function(card){
+  	if($scope.mode == "pass"){
+  		card.show = false;
+  		cardsToPass.push(card)
+  		if(cardsToPass.length >= 3){
+  			$scope.mode = "select"
+  			$scope.status = "Wait for others..."
+  			socket.emit("passCards", cardsToPass)
+  		}
+  	}
+  }
+
+  socket.on('gameStart', function(hand){
+  	$scope.status = "Click 3 cards to pass to left"
+  	$scope.hand = hand.map(function(i, index){
+  		i.imgName = i.description.toLowerCase()+"_of_"+i.suit.toLowerCase()+"s.svg";
+  		i.show = true;
+  		i.servIndex = index;
+  		return i;
+  	}).sort(function(a, b){
+  		if((a.suit) == (b.suit)){
+  			return (a.sort > b.sort) ? 1 : -1
+  		}
+  		return (a.suit > b.suit) ? 1 : -1;
+  	})
+  	console.log($scope.hand)
+  	$scope.$apply()
+  })
+}
+</script>
+{% endblock %}
