@@ -5,7 +5,7 @@ module.exports = function(name){
     var users = {}
     this.addUser = function(socket){
         socket.join(name)
-        socket.room = this
+        socket.data.room = this
         users[socket.id] = socket
         userCount++
     }
@@ -17,5 +17,27 @@ module.exports = function(name){
     }
     this.getUserCount = function(){
     	return userCount
+    }
+    this.getPlayerOnLeft = function(socket){
+        var leftUser = null
+        for(var id in users){
+            if(id == socket.id){
+                if(leftUser != null){
+                    return leftUser
+                }
+            }
+            leftUser = users[id]
+        }
+        return leftUser
+    }
+    this.userHasTwoOfSpades = function(socket){
+        var found = false;
+        socket.data.hand.forEach(function(i){
+            //console.log(i.sort)
+            if(i.sort == 2){
+                found  = true
+            }
+        })
+        return found
     }
 }
