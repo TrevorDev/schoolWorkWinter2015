@@ -17,18 +17,21 @@ module.exports = function(server){
             room: null,
             leftPlayer: null,
             rightPlayer: null,
-            hand: null
+            hand: null,
+            score: 0,
+            curMatchScore: 0
         }
         console.log('a user connected');
         if(!rooms[currentRoom]){
             gs.addRoom(currentRoom)
         }
         rooms[currentRoom].addUser(socket)
-        if(rooms[currentRoom].getUserCount() == 2){
+        if(rooms[currentRoom].getUserCount() == 4){
             var u = rooms[currentRoom].getUsers()
+            var playerNum = 1;
             for(var id in u){
                 u[id].data.hand = rooms[currentRoom].dealHand()
-                u[id].emit('gameStart', {hand: u[id].data.hand})
+                u[id].emit('gameStart', {hand: u[id].data.hand, playerNum: playerNum++})
             }
             currentRoom++
         }
@@ -51,6 +54,48 @@ module.exports = function(server){
             for(var id in u){
                 u[id].emit('receivePass', {hand: u[id].data.hand, yourTurn: u[id].data.room.userHasTwoOfSpades(u[id])})
             }
+        })
+
+        socket.on("playCard", function(card){
+            var currentWinner = socket.data.room.playCard(socket.data.hand[card.servIndex], socket)
+            socket.data.hand = socket.data.hand.filter(function(val, index){
+                return index != card.servIndex
+            })
+            var u = socket.data.room.getUsers()
+            var roundDone = socket.data.room.getCardsInPlay().length == 4;
+            if(roundDone){
+                var setAmt = socket.data.room.getCardsInPlayValue()
+                currentWinner.data.score += setAmt
+                currentWinner.data.curMatchScore += setAmt
+            }
+            for(var id in u){
+                var yourTurn = socket.data.room.getPlayerOnLeft(socket) == u[id]
+                if(roundDone){
+                    yourTurn = currentWinner == u[id]
+                }
+                u[id].emit('cardPlayed', {
+                    cardsInPlay: socket.data.room.getCardsInPlay(),
+                    hand: u[id].data.hand,
+                    yourTurn: yourTurn,
+                    scores: socket.data.room.getScores()
+                })
+            }
+
+
+            if(roundDone){
+                socket.data.room.clearCardsInPlay()
+            }
+
+            if(socket.data.room.allHandsPlayed()){
+                socket.data.room.shuffle()
+                var playerNum = 1;
+                for(var id in u){
+                    u[id].data.curMatchScore = 0
+                    u[id].data.hand = socket.data.room.dealHand()
+                    u[id].emit('gameStart', {hand: u[id].data.hand, playerNum: playerNum++})
+                }
+            }
+
         })
         socket.onclose = function(reason){ 
             //USE instead of disconnect to have access to sockets rooms

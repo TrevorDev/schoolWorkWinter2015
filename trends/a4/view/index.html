@@ -2,11 +2,23 @@
 {% block body %}
 
 <div class="container-wide" ng-controller="homeCtrl">
+<div ng-show="playerNum != null">
+  You are P[[playerNum]]
+</div>
+Scores:
+<div ng-repeat="score in scores track by $index">
+P[[$index+1]]: [[score]]
+</div>
 [[status]]
 <br>
 <div ng-repeat="card in hand" ng-show="card.show" style="display:inline">
-<img ng-click="cardHit(card)" src="/public/vendor/cards/[[card.imgName]]" alt="Mountain View" style="width:40px;">
+<img ng-click="cardHit(card)" src="/public/vendor/cards/[[card.imgName]]" style="width:40px;">
 </div>
+<br>
+<div ng-repeat="card in cardsInPlay" ng-show="card.show" style="display:inline">
+<img src="/public/vendor/cards/[[card.imgName]]" style="width:40px;">
+</div>
+
 </div>
 {% endblock %}
 
@@ -18,7 +30,10 @@
 function homeCtrl($scope, $http) {
   var socket = io();
   $scope.status = "Waiting for other players..."
+  $scope.playerNum = null
   $scope.hand = []
+  $scope.cardsInPlay = []
+  $scope.scores = [0,0,0,0]
   $scope.mode = "pass"
   $scope.playTwoClubs = false
   var cardsToPass = []
@@ -35,20 +50,64 @@ function homeCtrl($scope, $http) {
       return (a.suit > b.suit) ? 1 : -1;
     })
   }
+  $scope.setCardsInPlay = function(hand){
+     $scope.cardsInPlay = hand.map(function(i, index){
+      i.imgName = i.description.toLowerCase()+"_of_"+i.suit.toLowerCase()+"s.svg";
+      i.show = true;
+      i.servIndex = index;
+      return i;
+    })
+  }
+  $scope.handContainsSuit = function(suit){
+    var found = false
+    $scope.hand.forEach(function(i){
+      if(i.suit == suit){
+        found = true
+      }
+    })
+    return found
+  }
   $scope.cardHit = function(card){
   	if($scope.mode == "pass"){
   		card.show = false;
   		cardsToPass.push(card)
   		if(cardsToPass.length >= 3){
+         $scope.mode = "wait"
   			$scope.status = "Wait for others..."
   			socket.emit("passCards", cardsToPass)
   		}
   	}else if($scope.mode == "play"){
-      if(($scope.playTwoClubs && card.sort == 2) || !$scope.playTwoClubs){
-        socket.emit("playCard", card)
+      if(($scope.playTwoClubs && card.description == "Two" && card.suit == "Club") || !$scope.playTwoClubs){
+        if($scope.cardsInPlay.length == 0
+          || $scope.cardsInPlay.length == 4
+          || (card.suit == $scope.cardsInPlay[0].suit)
+          || !$scope.handContainsSuit($scope.cardsInPlay[0].suit)){
+          socket.emit("playCard", card)
+        }
       }
     }
   }
+  socket.on('cardPlayed', function(data){
+    $scope.scores = data.scores
+    $scope.playTwoClubs = false
+    $scope.setCardsInPlay(data.cardsInPlay)
+    $scope.setHand(data.hand)
+    if(data.yourTurn){
+      var typeMsg = ""
+      if($scope.cardsInPlay.length > 0){
+        typeMsg = " (Must be a "+$scope.cardsInPlay[0].suit+" if you have one)"
+      }
+      if($scope.cardsInPlay.length == 4){
+        typeMsg = " (You are leading suit)"
+      }
+      $scope.status = "Your turn to play"+typeMsg
+      $scope.mode = "play"
+    }else{
+      $scope.status = "Wait for your turn"
+      $scope.mode = "wait"
+    }
+    $scope.$apply()
+  })
   socket.on('receivePass', function(data){
     $scope.setHand(data.hand)
     console.log($scope.hand)
@@ -63,6 +122,10 @@ function homeCtrl($scope, $http) {
     $scope.$apply()
   })
   socket.on('gameStart', function(data){
+    $scope.mode = "pass"
+    $scope.cardsInPlay = []
+    cardsToPass = []
+    $scope.playerNum = data.playerNum
   	$scope.status = "Click 3 cards to pass to left"
   	$scope.setHand(data.hand)
   	console.log($scope.hand)
