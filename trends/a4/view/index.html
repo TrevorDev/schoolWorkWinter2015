@@ -5,10 +5,17 @@
 <div ng-show="playerNum != null">
   You are P[[playerNum]]
 </div>
+
 Scores:
 <div ng-repeat="score in scores track by $index">
 P[[$index+1]]: [[score]]
 </div>
+
+current round scores:
+<div ng-repeat="score in curScores track by $index">
+P[[$index+1]]: [[score]]
+</div>
+
 [[status]]
 <br>
 <div ng-repeat="card in hand" ng-show="card.show" style="display:inline">
@@ -17,6 +24,35 @@ P[[$index+1]]: [[score]]
 <br>
 <div ng-repeat="card in cardsInPlay" ng-show="card.show" style="display:inline">
 <img src="/public/vendor/cards/[[card.imgName]]" style="width:40px;">
+</div>
+
+<div ng-show="started">
+<pre>
+<h1>How to Play</h1>
+1) Shuffle and deal in a clockwise direction a standard deck of 52 playing cards with no
+jokers.
+2) Deal out all the cards until each player has 13.
+3) Take three cards from your hand and lay them facedown on the table before the first hand
+is played. Pass them to the player on your left.
+4) Pick up the three cards that were passed to you by the person on your right.
+5) Lead the 2 of clubs if you're holding it. Otherwise, play a club when it's your turn, going
+clockwise around the table.
+6) Pick up the trick if your card was the highest-numbered card in the suit that was led -
+which means that you won the trick.
+7) Lead the next trick if you won the first one. This time, you can lead with any suit.
+8) Follow suit if you didn't win the first trick. That is, play the suit that someone else leads.
+9) Play a heart (or another card of a different suit) only if a player leads a suit that you don't
+have.
+10) Lead with a heart only after someone plays a heart because he or she couldn't follow suit.
+11)Continue playing until all 13 tricks have been played.
+12)Count up the points - 1 for each heart and 13 for the queen of spades - from the tricks you
+took.
+13) Write your score and the other players' scores on a notepad.
+14) Let the person to your left deal the next hand.
+15)Repeat Steps 3) through 13).
+16) End the game when one person has reached or exceeded 100 points. The player with the
+lowest score at that point wins.
+</pre>
 </div>
 
 </div>
@@ -34,7 +70,9 @@ function homeCtrl($scope, $http) {
   $scope.hand = []
   $scope.cardsInPlay = []
   $scope.scores = [0,0,0,0]
+  $scope.curScores = [0,0,0,0]
   $scope.mode = "pass"
+  $scope.started = false
   $scope.playTwoClubs = false
   var cardsToPass = []
   $scope.setHand = function(hand){
@@ -88,7 +126,7 @@ function homeCtrl($scope, $http) {
     }
   }
   socket.on('cardPlayed', function(data){
-    $scope.scores = data.scores
+    $scope.curScores = data.scores
     $scope.playTwoClubs = false
     $scope.setCardsInPlay(data.cardsInPlay)
     $scope.setHand(data.hand)
@@ -122,6 +160,9 @@ function homeCtrl($scope, $http) {
     $scope.$apply()
   })
   socket.on('gameStart', function(data){
+    $scope.started = true
+    $scope.scores = data.scores
+    $scope.curScores = [0,0,0,0]
     $scope.mode = "pass"
     $scope.cardsInPlay = []
     cardsToPass = []

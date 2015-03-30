@@ -63,6 +63,15 @@ module.exports = function(name){
         }
         return ret
     }
+
+    this.getCurScores = function(){
+        var ret = []
+        for(var id in users){
+            ret.push(users[id].data.curMatchScore)
+        }
+        return ret
+    }
+
     this.getPlayerOnLeft = function(socket){
         var leftUser = null
         for(var id in users){

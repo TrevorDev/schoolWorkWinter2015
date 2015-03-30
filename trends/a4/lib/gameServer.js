@@ -31,7 +31,7 @@ module.exports = function(server){
             var playerNum = 1;
             for(var id in u){
                 u[id].data.hand = rooms[currentRoom].dealHand()
-                u[id].emit('gameStart', {hand: u[id].data.hand, playerNum: playerNum++})
+                u[id].emit('gameStart', {hand: u[id].data.hand, playerNum: playerNum++, scores: socket.data.room.getScores()})
             }
             currentRoom++
         }
@@ -77,7 +77,7 @@ module.exports = function(server){
                     cardsInPlay: socket.data.room.getCardsInPlay(),
                     hand: u[id].data.hand,
                     yourTurn: yourTurn,
-                    scores: socket.data.room.getScores()
+                    scores: socket.data.room.getCurScores()
                 })
             }
 
@@ -88,11 +88,22 @@ module.exports = function(server){
 
             if(socket.data.room.allHandsPlayed()){
                 socket.data.room.shuffle()
+
+                for(var id in u){
+                    if(u[id].data.curMatchScore == 26){
+                        u[id].data.score -= 26*2;
+                        for(var id in u){
+                            u[id].data.score += 26;
+                        }
+                        break;
+                    }
+                }
+
                 var playerNum = 1;
                 for(var id in u){
                     u[id].data.curMatchScore = 0
                     u[id].data.hand = socket.data.room.dealHand()
-                    u[id].emit('gameStart', {hand: u[id].data.hand, playerNum: playerNum++})
+                    u[id].emit('gameStart', {hand: u[id].data.hand, playerNum: playerNum++, scores: socket.data.room.getScores()})
                 }
             }
 
