@@ -18,8 +18,10 @@ P[[$index+1]]: [[score]]
 
 [[status]]
 <br>
+<div id="myCards" style="display: inline-block;">
 <div ng-repeat="card in hand" ng-show="card.show" style="display:inline">
 <img ng-click="cardHit(card)" src="/public/vendor/cards/[[card.imgName]]" style="width:40px;">
+</div>
 </div>
 <br>
 <div ng-repeat="card in cardsInPlay" ng-show="card.show" style="display:inline">
@@ -172,6 +174,46 @@ function homeCtrl($scope, $http) {
   	console.log($scope.hand)
   	$scope.$apply()
   })
+
+  socket.on('gameOver', function(data){
+    $scope.started = true
+    $scope.scores = data.scores
+    $scope.curScores = [0,0,0,0]
+    $scope.mode = "Game over"
+    $scope.cardsInPlay = []
+    cardsToPass = []
+    $scope.playerNum = data.playerNum
+    
+    $scope.$apply()
+
+    if($scope.status != "Game over"){
+      $scope.status = "Game over"
+      if(data.playerLeft){
+        alert("A player has left. See minumum score for current winner. Find new game?")
+      }else{
+        alert("Game Over. See minumum score for winner. Play again?")
+      }
+    }
+    
+    location.reload();
+  })
 }
+var horde = gremlins.createHorde()
+ horde.gremlin(gremlins.species.clicker()
+ .clickTypes(['click'])
+ .positionSelector(function() {
+    // only click inside the foo element area
+    var $el = $('#myCards');
+    var offset = $el.offset();
+    return [
+      parseInt(Math.random() * ($el.outerWidth() + 100) + offset.left),
+      parseInt(Math.random() * $el.outerHeight() + offset.top)
+    ];
+ })
+ );
+ horde.strategy(gremlins.strategies.distribution()
+  .delay(50)
+  )
+ //horde.unleash({ nb: 1000000 })
 </script>
 {% endblock %}

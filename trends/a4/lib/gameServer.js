@@ -98,12 +98,18 @@ module.exports = function(server){
                         break;
                     }
                 }
+                var gameOver = false;
+                for(var id in u){
+                    if(u[id].data.score >= 100){
+                        gameOver = true;
+                    }
+                }
 
                 var playerNum = 1;
                 for(var id in u){
                     u[id].data.curMatchScore = 0
                     u[id].data.hand = socket.data.room.dealHand()
-                    u[id].emit('gameStart', {hand: u[id].data.hand, playerNum: playerNum++, scores: socket.data.room.getScores()})
+                    u[id].emit(gameOver?'gameOver':'gameStart', {hand: u[id].data.hand, playerNum: playerNum++, scores: socket.data.room.getScores(), playerLeft: false})
                 }
             }
 
@@ -111,6 +117,13 @@ module.exports = function(server){
         socket.onclose = function(reason){ 
             //USE instead of disconnect to have access to sockets rooms
             //console.log(socket.rooms)
+            var u = socket.data.room.getUsers()
+            if(rooms[currentRoom] == socket.data.room){
+                currentRoom++;
+            }
+            for(var id in u){
+                u[id].emit('gameOver', {hand: u[id].data.hand, playerNum: playerNum++, scores: socket.data.room.getScores(), playerLeft: true})
+            }
             Object.getPrototypeOf(this).onclose.call(this,reason);
         }
     });
