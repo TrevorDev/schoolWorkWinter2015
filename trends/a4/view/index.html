@@ -92,6 +92,7 @@ function homeCtrl($scope, $http) {
   $scope.mode = "pass"
   $scope.started = false
   $scope.playTwoClubs = false
+  $scope.seenHeart = false;
   var cardsToPass = []
   $scope.setHand = function(hand){
     $scope.hand = hand.map(function(i, index){
@@ -138,7 +139,9 @@ function homeCtrl($scope, $http) {
           || $scope.cardsInPlay.length == 4
           || (card.suit == $scope.cardsInPlay[0].suit)
           || !$scope.handContainsSuit($scope.cardsInPlay[0].suit)){
-          socket.emit("playCard", card)
+          if(card.suit != "Heart" || $scope.seenHeart || $scope.cardsInPlay.length != 4){
+            socket.emit("playCard", card)
+          }
         }
       }
     }
@@ -147,6 +150,22 @@ function homeCtrl($scope, $http) {
     $scope.curScores = data.scores
     $scope.playTwoClubs = false
     $scope.setCardsInPlay(data.cardsInPlay)
+    $scope.cardsInPlay.forEach(function(c){
+      if(c.suit == "Heart"){
+        $scope.seenHeart = true;
+      }
+    })
+
+    var seenNonHeart = false;
+    $scope.hand.forEach(function(c){
+      if(c.suit != "Heart"){
+        seenNonHeart = true
+      }
+    })
+    if(!seenNonHeart){
+      $scope.seenHeart = true;
+    }
+
     $scope.setHand(data.hand)
     if(data.yourTurn){
       var typeMsg = ""
@@ -155,6 +174,9 @@ function homeCtrl($scope, $http) {
       }
       if($scope.cardsInPlay.length == 4){
         typeMsg = " (You are leading suit)"
+        if(!$scope.seenHeart){
+          typeMsg += " Cannot lead heart yet"
+        }
       }
       $scope.status = "Your turn to play"+typeMsg
       $scope.mode = "play"
@@ -179,6 +201,7 @@ function homeCtrl($scope, $http) {
   })
   socket.on('gameStart', function(data){
     $scope.started = true
+    $scope.seenHeart = false
     $scope.scores = data.scores
     $scope.curScores = [0,0,0,0]
     $scope.mode = "pass"
