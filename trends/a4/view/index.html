@@ -6,17 +6,33 @@
   You are P[[playerNum]]
 </div>
 
-Scores:
+<div class="row">
+<div class="col-md-6">
+<h2>Scores:</h2>
 <div ng-repeat="score in scores track by $index">
 P[[$index+1]]: [[score]]
 </div>
+</div>
 
-current round scores:
+<div class="col-md-6">
+<h2>Current round scores:</h2>
 <div ng-repeat="score in curScores track by $index">
 P[[$index+1]]: [[score]]
 </div>
+</div>
+</div>
 
-[[status]]
+
+
+<center>
+<div ng-show="started">
+<img src="/public/custom/img/players.jpg">
+</div>
+<div style="min-height: 60px;">
+<div ng-repeat="card in cardsInPlay" ng-show="card.show" style="display:inline">
+<img src="/public/vendor/cards/[[card.imgName]]" style="width:40px;">
+</div>
+</div>
 <br>
 <div id="myCards" style="display: inline-block;">
 <div ng-repeat="card in hand" ng-show="card.show" style="display:inline">
@@ -24,9 +40,9 @@ P[[$index+1]]: [[score]]
 </div>
 </div>
 <br>
-<div ng-repeat="card in cardsInPlay" ng-show="card.show" style="display:inline">
-<img src="/public/vendor/cards/[[card.imgName]]" style="width:40px;">
-</div>
+[[status]]
+</center>
+<br>
 
 <div ng-show="started">
 <pre>
